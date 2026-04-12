@@ -245,6 +245,8 @@ class AutoClickerInstance:
             res = self.zoom_out_max_logic()
         elif action == "loop_cases":
             res = self.loop_cases_logic(step)
+        elif action == "if_exists":
+            res = self.if_exists_logic(step)
         elif action == "click_any":
             res = self.click_any_logic(step)
         elif action == "wait":
@@ -404,28 +406,44 @@ class AutoClickerInstance:
                             "script": [
                                 {"action": "click_image", "target": "images/vang.png"},
                                 {"action": "wait", "timeout": 2},
-                                {"action": "click_image", "target": "images/den_lam.png"},
-                                {"action": "wait", "timeout": 2},
-                                {"action": "click_image", "target": "images/lam.png"},
-                                {"action": "wait", "timeout": 5},
-                                {"action": "click_image", "target": "images/xac_nhan.png"},
-                                {"action": "click_any", "timeout": 5},
-                                {"action": "wait", "timeout": 5},
-                                {"action": "click_image", "target": "images/giao.png"},
-                                {"action": "click_any", "timeout": 5}
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/den_lam.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image", "target": "images/den_lam.png"},
+                                        {"action": "wait", "timeout": 2},
+                                        {"action": "click_image", "target": "images/lam.png"},
+                                        {"action": "wait", "timeout": 5},
+                                        {"action": "click_image", "target": "images/xac_nhan.png"},
+                                        {"action": "click_any", "timeout": 3},
+                                        {"action": "wait", "timeout": 5},
+                                        {"action": "click_image", "target": "images/giao.png"},
+                                        {"action": "click_any", "timeout": 3}
+                                    ]
+                                },
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/next.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image", "target": "images/bo_qua.png"},
+                                        {"action": "wait", "timeout": 2},
+                                        {"action": "click_any", "timeout": 3},
+                                    ]
+                                }
                             ]
                         },
                         {
                             "trigger": "images/xanh.png",
                             "script": [
                                 {"action": "click_image", "target": "images/xanh.png"},
-                                {"action": "click_image", "target": "images/gui.png"},
-                                {"action": "wait", "timeout": 2}
+                                {"action": "click_image", "target": "images/giao.png"},
+                                {"action": "click_any", "timeout": 3}
                             ]
                         }
                     ]
-                },
-                {"action": "click_image_if", "target": "images/x1.png", "timeout": 5},
+                }
             ], 
             interval=120, 
             max_runs=-1
@@ -469,6 +487,54 @@ class AutoClickerInstance:
                 break
             time.sleep(1)
         return True
+
+    def if_exists_logic(self, step):
+        target = step.get("target")
+        sub_script = step.get("script", [])
+        timeout = step.get("timeout", 0) # Mặc định là 0 (quét 1 lần duy nhất)
+        if not target: return True
+        
+        start_time = time.time()
+        found = False
+        
+        while self.running:
+            screen = self.get_screenshot()
+            if screen is None: 
+                time.sleep(0.5)
+                if time.time() - start_time > timeout: break
+                continue
+            
+            t_img = get_cached_image(target)
+            if t_img is None: 
+                del screen
+                break
+                
+            res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(res)
+            del res
+            del screen
+            
+            if max_val >= 0.8:
+                found = True
+                break
+            
+            # Nếu hết thời gian chờ
+            if time.time() - start_time > timeout:
+                break
+            time.sleep(0.5)
+            
+        if found:
+            self.log(f"ĐIỀU KIỆN ĐÚNG: Tìm thấy {os.path.basename(target)}, thực hiện kịch bản con...")
+            for s_step in sub_script:
+                if not self.running: break
+                self.execute_step(s_step)
+            return True
+        else:
+            if timeout > 0:
+                self.log(f"ĐIỀU KIỆN SAI: Chờ {timeout}s không thấy {os.path.basename(target)}, bỏ qua.")
+            else:
+                self.log(f"ĐIỀU KIỆN SAI: Không thấy {os.path.basename(target)} (Quét tức thì), bỏ qua.")
+            return True
 
     def click_any_logic(self, step):
         delay = step.get("timeout", 0)
