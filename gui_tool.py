@@ -311,24 +311,41 @@ class AutoClickerInstance:
         self.add_task(
             name="Thuê Ngọc Trai", 
             script=[
-                {"action": "click_image", "target": "images/ngoc_trai.png", "timeout": 10},
+                {"action": "click_image", "target": "images/ngoc_trai1.png", "timeout": 10},
                 {"action": "click_image", "target": "images/thu_hoach.png", "timeout": 10},
                 {"action": "click_image", "target": "images/plus.png", "timeout": 10},
                 {"action": "click_image", "target": "images/thue.png", "timeout": 10},
                 {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 10},
-                
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 5},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 5},
                 {"action": "click_image", "target": "images/thue.png", "timeout": 10},
-                {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 10},
-                
-                {"action": "click_image", "target": "images/thue.png", "timeout": 10},
-                {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 10},
-                
-                {"action": "click_image_if", "target": "images/thue.png", "timeout": 5},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 5},
+                {"action": "click_image_if", "target": "images/space.png", "timeout": 5},
+                {"action": "click_image_if", "target": "images/plus.png", "timeout": 5},
+                {"action": "click_image", "target": "images/thue.png", "timeout": 10},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/space.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/plus.png", "timeout": 3},
+                {"action": "click_image", "target": "images/thue.png", "timeout": 10},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 3},
+                 {"action": "click_image_if", "target": "images/space.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/plus.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/thue.png", "timeout": 3},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 3},
+                 {"action": "click_image_if", "target": "images/space.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/plus.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/thue.png", "timeout": 3},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 3},
+                 {"action": "click_image_if", "target": "images/space.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/plus.png", "timeout": 3},
+                {"action": "click_image_if", "target": "images/thue.png", "timeout": 3},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 3},
                 {"action": "click_image_if", "target1": "images/x.png", "target2": "images/x2.png", "timeout": 5},
 
             ], 
@@ -345,7 +362,7 @@ class AutoClickerInstance:
                 {"action": "click_image", "target": "images/trong_hoa_tuoi.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/tat_ca_thu_hoach.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
-                {"action": "click_image", "target": "images/thoat_hoi.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/thoat_trong_cay.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_image", "target": "images/thoat_hoi.png",  "timeout": 20},
 
@@ -358,7 +375,7 @@ class AutoClickerInstance:
             name="Lấy vàng trong shop", 
             script=[
                 {"action": "click_image", "target": "images/multi.png",  "timeout": 20},
-                {"action": "click_image", "target": "images/tiem.jpg",  "timeout": 20},
+                {"action": "click_image", "target": "images/tiem1.png",  "timeout": 20},
                 {"action": "wait", "timeout": 5},
                 {"action": "click_image", "target": "images/tiem_nguyen_lieu.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
@@ -394,17 +411,17 @@ class AutoClickerInstance:
                     "action": "loop_cases",
                     "cases": [
                         {
-                            "trigger": "images/do.png",
+                            "trigger": "images/do1.png",
                             "script": [
-                                {"action": "click_image", "target": "images/do.png"},
+                                {"action": "click_image", "target": "images/do1.png"},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image", "target": "images/chua_co_hang.png"}
                             ]
                         },
                         {
-                            "trigger": "images/vang.png",
+                            "trigger": "images/vang1.png",
                             "script": [
-                                {"action": "click_image", "target": "images/vang.png"},
+                                {"action": "click_image", "target": "images/vang1.png"},
                                 {"action": "wait", "timeout": 2},
                                 {
                                     "action": "if_exists",
