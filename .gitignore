@@ -1,0 +1,33 @@
+# Files created by the tool
+SUCCESS_ACC.txt
+FAILED_ACC.txt
+license.bin
+config.json
+debug_*.png
+*.log
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS Files
+Thumbs.db
+Desktop.ini
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env
+
+# PyInstaller / Build
+build/
+dist/
+*.spec
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
