@@ -386,7 +386,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng cư dân", 
             script=[
-                {"action": "click_image", "target": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/nhiem_vu.png", "target": "images/nhiem_vu1.jpg",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/gui.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
