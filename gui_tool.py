@@ -311,7 +311,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Thuê Ngọc Trai", 
             script=[
-                {"action": "click_image", "target": "images/ngoc_trai1.png", "timeout": 10},
+                {"action": "click_image", "target": "images/ngoc_trai.png", "timeout": 10},
                 {"action": "click_image_if", "target": "images/thu_hoach.png", "timeout": 3},
                 {"action": "loop_cases",
                     "cases": [
@@ -349,14 +349,14 @@ class AutoClickerInstance:
         self.add_task(
             name="Trồng hoa tươi trong hội", 
             script=[
-                {"action": "click_image", "target": "images/hoi.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/hoi1.png",  "timeout": 20},
                 {"action": "click_image_if", "target1": "images/x.png", "target2": "images/x2.png", "timeout": 5},
-                {"action": "click_image", "target": "images/trong_hoa_tuoi.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/trong_hoa_tuoi1.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/tat_ca_thu_hoach.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_image", "target": "images/thoat_trong_cay.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/thoat_hoi.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/thoat_hoi1.png",  "timeout": 20},
 
             ], 
             interval=60*60*1.5, 
@@ -411,17 +411,17 @@ class AutoClickerInstance:
                     "action": "loop_cases",
                     "cases": [
                         {
-                            "trigger": "images/do1.png",
+                            "trigger": "images/do.png",
                             "script": [
-                                {"action": "click_image", "target": "images/do1.png"},
+                                {"action": "click_image", "target": "images/do.png"},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image", "target": "images/chua_co_hang.png"}
                             ]
                         },
                         {
-                            "trigger": "images/vang1.png",
+                            "trigger": "images/vang.png",
                             "script": [
-                                {"action": "click_image", "target": "images/vang1.png"},
+                                {"action": "click_image", "target": "images/vang.png"},
                                 {"action": "wait", "timeout": 2},
                                 {
                                     "action": "if_exists",
@@ -462,10 +462,10 @@ class AutoClickerInstance:
                             ]
                         },
                         {
-                            "trigger": "images/xanh1.png",
+                            "trigger": "images/xanh.png",
                             
                             "script": [
-                                {"action": "click_image", "target": "images/xanh1.png"},
+                                {"action": "click_image", "target": "images/xanh.png"},
                                 {"action": "click_image", "target": "images/giao.png"},
                                 {"action": "click_any", "timeout": 3},
                                 {
@@ -473,7 +473,7 @@ class AutoClickerInstance:
                                     "target": "images/next.png",
                                     "timeout": 3,
                                     "script": [
-                                        {"action": "click_image", "target": "images/xanh1.png"},
+                                        {"action": "click_image", "target": "images/xanh.png"},
                                         {"action": "wait", "timeout": 2},
                                         {"action": "click_image", "target": "images/nhan.png"},
                                         {"action": "click_image", "target": "images/xx.png"},
