@@ -362,7 +362,7 @@ class AutoClickerInstance:
             interval=60*60*1.5, 
             max_runs=-1
         )
-        # Task 3: Trồng hoa tươi trong hội
+        # Task 3: Mua ở Shop
         self.add_task(
             name="Lấy vàng trong shop", 
             script=[
@@ -386,7 +386,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng cư dân", 
             script=[
-                {"action": "click_image", "target": "images/nhiem_vu.png", "target": "images/nhiem_vu1.jpg",  "timeout": 20},
+                {"action": "click_image", "target": "images/nhiem_vu.png", "target2": "images/nhiem_vu1.jpg", "target3": "images/nhiem_vu2.jpg",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/gui.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
@@ -451,10 +451,10 @@ class AutoClickerInstance:
                                 },
                                 {
                                     "action": "if_exists",
-                                    "target": "images/x.png","target2": "images/x2.png",
+                                    "target": "images/x.png","target2": "images/x2.png","target3": "images/x5.jpg",
                                     "timeout": 3,
                                     "script": [
-                                        {"action": "click_image", "target": "images/x.png", "target2": "images/x2.png"},
+                                        {"action": "click_image", "target": "images/x.png", "target2": "images/x2.png","target3": "images/x5.jpg"},
                                         {"action": "wait", "timeout": 2},
                                         
                                     ]
