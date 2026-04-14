@@ -352,7 +352,7 @@ class AutoClickerInstance:
                 {"action": "loop_cases",
                     "cases": [
                         {
-                            "trigger": "images/plus.png",
+                            "trigger": "images/plus.png","trigger1": "images/plus1.png"
                             "script": [
                                 {"action": "click_image", "target": "images/plus.png" , "target2": "images/plus1.png"},
                                 {"action": "click_image_if", "target": "images/the_gioi.jpg", "timeout": 5},
