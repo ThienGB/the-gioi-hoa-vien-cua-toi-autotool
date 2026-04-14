@@ -122,12 +122,34 @@ def verify_license(key, hwid):
     except:
         return False, "Key sai định dạng!"
 
-# Công cụ nhanh cho Admin để tạo Key (Bạn có thể bỏ vào file riêng)
-# def generate_key(hwid, days):
-#     expiry = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d")
-#     sig = hashlib.sha256(f"{expiry}{hwid}{SECRET_KEY}".encode()).hexdigest()[:10]
-#     full_key = base64.b64encode(f"{expiry}|{sig}".encode()).decode()
-#     return full_key
+# --- Flower Configuration ---
+def get_flower_config():
+    """
+    HÀM ĐIỀN THÔNG TIN CÁC LOẠI HOA (JSON)
+    id: Thứ tự hoa (để tính số lần bấm Next)
+    type: 1 (thu hoạch 1 lần), 2 (thu hoạch nhiều lần)
+    image: đường dẫn ảnh hoa trong game
+    growth_time: thời gian hoa chín (giây)
+    """
+    return [
+        {"id": 1, "name": "Hoa Hướng Dương", "search_name": "Hoa Huwowng Duwowng", "image": "images/flowers/huong_duong.png", "type": 1, "growth_time": 30},
+        {"id": 2, "name": "Hoa Hồng", "search_name": "Hoa Hoofng", "image": "images/flowers/hong.png", "type": 2, "growth_time": 45},
+        {"id": 3, "name": "Hoa Lan", "search_name": "Hoa Lan", "image": "images/flowers/lan.png", "type": 1, "growth_time": 60},
+        {"id": 4, "name": "Hoa Huệ", "search_name": "Hoa Hueej", "image": "images/flowers/hue.png", "type": 2, "growth_time": 40},
+        {"id": 5, "name": "Hoa Cúc", "search_name": "Hoa Cuosc", "image": "images/flowers/cuc.png", "type": 1, "growth_time": 20},
+        {"id": 6, "name": "Hoa Sen", "search_name": "Hoa Sen", "image": "images/flowers/sen.png", "type": 2, "growth_time": 50},
+        {"id": 7, "name": "Hoa Súng", "search_name": "Hoa Sungs", "image": "images/flowers/sung.png", "type": 1, "growth_time": 30},
+        {"id": 8, "name": "Hoa Đào", "search_name": "Hoa Ddaof", "image": "images/flowers/dao.png", "type": 1, "growth_time": 100},
+        {"id": 9, "name": "Hoa Mai", "search_name": "Hoa Mai", "image": "images/flowers/mai.png", "type": 1, "growth_time": 100},
+        {"id": 10, "name": "Hoa Tulip", "search_name": "Hoa Tulip", "image": "images/flowers/tulip.png", "type": 2, "growth_time": 80},
+        {"id": 11, "name": "Hoa Cẩm Tú Cầu", "search_name": "Hoa Caamba Tus Caafu", "image": "images/flowers/cam_tu_cau.png", "type": 1, "growth_time": 120},
+        {"id": 12, "name": "Hoa Oải Hương", "search_name": "Hoa Oair Huwowng", "image": "images/flowers/oai_huong.png", "type": 2, "growth_time": 90},
+        {"id": 13, "name": "Hoa Thạch Thảo", "search_name": "Hoa Thachj Thaoir", "image": "images/flowers/thach_thao.png", "type": 1, "growth_time": 50},
+        {"id": 14, "name": "Hoa Đồng Tiền", "search_name": "Hoa Ddoofng Tieefn", "image": "images/flowers/dong_tien.png", "type": 2, "growth_time": 70},
+        {"id": 15, "name": "Hoa Mười Giờ", "search_name": "Hoa Muwowif Giowf", "image": "images/flowers/muoi_gio.png", "type": 1, "growth_time": 10},
+    ]
+
+# --- Theme Configuration ---
 
 # --- Theme Configuration ---
 ctk.set_appearance_mode("Dark")
@@ -147,12 +169,16 @@ class AutoClickerInstance:
         self.device_id = device_id
         self.adb_path = adb_path
         self.ld_path = ld_path # Lưu đường dẫn LDPlayer được truyền vào
+        self.enabled_tasks_vars = None # Sẽ nhận từ UI
         self.log_func = log_func
         self.update_ui_func = update_ui_func
         self.running = False
         # Tasks list: Each task is {name, script, interval, max_runs, current_runs, next_run}
         self.tasks = []
         self.current_task_index = -1
+        self.flower_task_active = False
+        self.flower_queue = [] # Hàng đợi hoa: tối đa 5 phần tử {flower_info, count, interval}
+        self.last_coords = None # Lưu tọa độ click gần nhất để tái sử dụng
         
         # Default initialization (will be overridden by UI/config)
         self.add_task("Main Task", [
@@ -180,6 +206,14 @@ class AutoClickerInstance:
             elif char in chars_to_escape: escaped_text += f"\\{char}"
             else: escaped_text += char
         return escaped_text
+
+    def get_ld_index(self):
+        try:
+            port_match = re.search(r'(\d+)', self.device_id)
+            if not port_match: return None
+            port = int(port_match.group(1))
+            return (port - 5554) // 2
+        except: return None
 
     def update_status(self, status, is_lagging=None):
         self.status = status
@@ -249,10 +283,16 @@ class AutoClickerInstance:
             res = self.if_exists_logic(step)
         elif action == "click_any":
             res = self.click_any_logic(step)
+        elif action == "click_coords":
+            res = self.click_coords_logic(step)
+        elif action == "type_text":
+            res = self.type_text_logic(step)
         elif action == "wait":
             wait_time = step.get("duration") or step.get("timeout") or 1
             time.sleep(wait_time)
             res = True
+        elif action == "click_saved_coords":
+            res = self.click_saved_coords_logic(step)
         
         # Kiểm tra lag: Nếu 1 bước mất hơn 35s
         duration = time.time() - self.last_step_time
@@ -266,10 +306,8 @@ class AutoClickerInstance:
     def zoom_out_max_logic(self):
         self.log("HÀNH ĐỘNG: Zoom Out (Dùng lệnh điều khiển LDPlayer)...")
         try:
-            port_match = re.search(r'(\d+)', self.device_id)
-            if not port_match: return False
-            port = int(port_match.group(1))
-            idx = (port - 5554) // 2
+            idx = self.get_ld_index()
+            if idx is None: return False
             
             ld_console = self.ld_path
             if ld_console and os.path.isdir(ld_console):
@@ -446,6 +484,34 @@ class AutoClickerInstance:
             interval=120, 
             max_runs=-1
         )
+        # Task 6: Trưng bày hoa
+        self.add_task(
+            name="Trưng bày hoa", 
+            script=[
+                {"action": "click_image", "target": "images/trung_bay_hoa.jpg",  "timeout": 20},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "wait", "timeout": 5},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "wait", "timeout": 5},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 175, "y": 760}, 
+                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
+            ], 
+            interval=60*48, 
+            max_runs=-1
+        )
+
 
     def loop_cases_logic(self, step):
         cases = step.get("cases", [])
@@ -551,6 +617,50 @@ class AutoClickerInstance:
             return True
         return False
 
+    def type_text_logic(self, step):
+        text = step.get("text", "")
+        if not text: return True
+        self.log(f"NHẬP CHỮ: {text}")
+
+        # Xóa bỏ phần gọi LDConsole vì tùy thuộc vào vị trí trỏ chuột và phiên bản, ldconsole có thể lỗi ngầm gây miss text.
+        # Dùng ADB truyền thống là ổn định nhất dành cho Android/LDPlayer.
+        
+        # Để gõ được khoảng cách qua ADB chuẩn xác từ command line của Windows:
+        # Ta dùng `%s` làm khoảng trắng, Android shell sẽ tự phiên phối lại thành space.
+        # Lưu ý: ADB shell input text không hỗ trợ trực tiếp Unicode, nên người dùng
+        # cần khai báo tiếng Việt kiểu gõ Telex (Vd: "Hoa Hoofng" -> game tự hiển thị "Hoa Hồng").
+        formatted_text = text.replace(" ", "%s")
+        
+        # Gửi sự kiện gõ chữ
+        self.call_adb(["shell", "input", "text", formatted_text])
+        
+        return True
+
+    def click_saved_coords_logic(self, step):
+        if self.last_coords:
+            cx, cy = self.last_coords
+            # Thêm một chút độ trễ nếu có yêu cầu
+            wait_time = step.get("wait_before", 0)
+            if wait_time > 0: time.sleep(wait_time)
+            
+            self.call_adb(["shell", "input", "tap", str(cx), str(cy)])
+            self.log(f"CLICK TỌA ĐỘ LƯU: ({cx}, {cy})")
+            return True
+        else:
+            self.log("LỖI: Chưa có tọa độ được lưu để click!")
+            return False
+
+    def click_coords_logic(self, step):
+        x = step.get("x")
+        y = step.get("y")
+        if x is not None and y is not None:
+            delay = step.get("timeout", 0)
+            if delay > 0: time.sleep(delay)
+            self.call_adb(["shell", "input", "tap", str(x), str(y)])
+            self.log(f"CLICK TỌA ĐỘ: ({x}, {y})")
+            return True
+        return False
+
     def click_image_logic(self, step):
         targets = []
         if step.get("target"): targets.append(step.get("target"))
@@ -594,7 +704,8 @@ class AutoClickerInstance:
                         th, tw = t_img.shape[:2]
                         cx, cy = max_loc[0] + tw//2, max_loc[1] + th//2
                         self.call_adb(["shell", "input", "tap", str(cx), str(cy)])
-                        self.log(f"CLICK: {os.path.basename(t_path)} (Khớp: {max_val:.2f})")
+                        self.last_coords = (cx, cy)
+                        self.log(f"CLICK: {os.path.basename(t_path)} (Khớp: {max_val:.2f}) Tọa độ: {self.last_coords}")
                         del screen
                         return True
                     else:
@@ -605,15 +716,94 @@ class AutoClickerInstance:
             time.sleep(1)
         return False
 
-    def add_task(self, name, script, interval=60, max_runs=-1):
+    def add_task(self, name, script, interval=60, max_runs=-1, initial_delay=0):
         self.tasks.append({
             "name": name,
             "script": script,
             "interval": interval,
             "max_runs": max_runs,
             "current_runs": 0,
-            "next_run": time.time()
+            "next_run": time.time() + initial_delay
         })
+
+    def add_flower_task(self, flower_info, harvest_count=1, harvest_interval=60):
+        if len(self.flower_queue) >= 5:
+            self.log(f"CẢNH BÁO: Hàng đợi hoa đã đầy (5/5). Không thể thêm {flower_info['name']}.")
+            return
+            
+        self.flower_queue.append({
+            "flower_info": flower_info,
+            "harvest_count": harvest_count,
+            "harvest_interval": harvest_interval
+        })
+        self.log(f"ĐÃ THÊM HÀNG ĐỢI: {flower_info['name']} ({len(self.flower_queue)}/5)")
+        
+        # Nếu chưa có task trồng hoa nào đang chạy thì kích hoạt hoa đầu tiên
+        has_flower_task = any(t.get("name") in ["Flower_Plant", "Flower_Harvest"] for t in self.tasks)
+        if not has_flower_task:
+            self.schedule_next_flower()
+
+    def schedule_next_flower(self):
+        if not self.flower_queue:
+            self.flower_task_active = False
+            return
+            
+        next_item = self.flower_queue[0]
+        f = next_item["flower_info"]
+        
+        search_txt = f.get("search_name", f["name"])[:10] # Chỉ lấy 10 ký tự đầu
+        
+        # --- GIAI ĐOẠN 1: TRỒNG VÀ TƯỚI NƯỚC (Chạy nhanh, không đợi) ---
+        script_plant = [
+            {"action": "click_image", "target": "images/dat_trong.png", "timeout": 20},
+            # {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 20},
+            {"action": "wait", "timeout": 3},
+            {"action": "click_coords", "x": 200, "y": 520}, # Click ô tìm kiếm
+            {"action": "wait", "timeout": 5},
+            {"action": "type_text", "text": search_txt},
+            {"action": "wait", "timeout": 3},
+            {"action": "click_coords", "x": 110, "y": 590}, # Click chọn hoa đầu tiên
+            {"action": "wait", "timeout": 5},
+            {"action": "click_saved_coords"}, # Nhấn vào đất để hiện menu/tưới
+            {"action": "click_image", "target": "images/tuoi_nhanh.png", "timeout": 20}
+        ]
+        
+        # Thêm task trồng, chạy xong task này sẽ chuyển sang phase thu hoạch
+        self.add_task("Flower_Plant", script_plant, interval=0, max_runs=1)
+        self.flower_task_active = True
+        self.log(f"TIẾN HÀNH TRỒNG: {f['name']}")
+
+    def schedule_harvest(self, is_first=True):
+        if not self.flower_queue: return
+        
+        next_item = self.flower_queue[0]
+        f = next_item["flower_info"]
+        inter = next_item["harvest_interval"]
+        growth = f.get("growth_time", 30)
+        
+        # Kịch bản cho 1 lần thu hoạch
+        script_harvest = [
+            {"action": "wait", "timeout": 5},
+            {"action": "click_saved_coords"},
+            {"action": "click_image_if", "target": "images/thu_hoach_nhanh.png", "timeout": 5}
+        ]
+        
+        # Lần đầu chờ hoa chín, các lần sau chờ thời gian giữa các đợt (inter)
+        delay = growth if is_first else inter
+        
+        # Thêm task thu hoạch chạy 1 lần sau thời gian delay (giúp xen kẽ task khác)
+        self.add_task("Flower_Harvest", script_harvest, interval=0, max_runs=1, initial_delay=delay)
+        self.log(f"ĐÃ LÊN LỊCH THU HOẠCH: {f['name']} sau {delay}s")
+
+    def stop_flower_task(self):
+        new_tasks = []
+        for t in self.tasks:
+            if t.get("name") not in ["Flower_Plant", "Flower_Harvest"]:
+                new_tasks.append(t)
+        self.tasks = new_tasks
+        self.flower_queue = [] 
+        self.flower_task_active = False
+        self.log("Đã dừng và xóa sạch hàng đợi trồng hoa.")
 
     def run(self):
         self.running = True
@@ -626,6 +816,16 @@ class AutoClickerInstance:
             next_task_time = float('inf')
             
             for task in self.tasks[:]:
+                # Kiểm tra xem Task này có đang được bật trên UI không
+                t_name = task.get("name")
+                if self.enabled_tasks_vars:
+                    if t_name in ["Flower_Plant", "Flower_Harvest"]:
+                        if not self.enabled_tasks_vars.get("Trồng hoa tự động").get():
+                            continue
+                    elif t_name in self.enabled_tasks_vars:
+                        if not self.enabled_tasks_vars.get(t_name).get():
+                            continue
+
                 if task["max_runs"] == -1 or task["current_runs"] < task["max_runs"]:
                     if now >= task["next_run"]:
                         due_tasks.append(task)
@@ -661,6 +861,24 @@ class AutoClickerInstance:
                 if task["max_runs"] != -1 and task["current_runs"] >= task["max_runs"]:
                     self.log(f"HẾT LƯỢT: Tác vụ '{task['name']}' đã xong.")
                     if task in self.tasks: self.tasks.remove(task)
+                    
+                    # Logic chuyển tiếp cho Flower Task (Tránh làm nghẽn các task khác)
+                    if task.get("name") == "Flower_Plant":
+                        # Trồng xong -> Chuyển sang giai đoạn chờ thu hoạch lượt đầu
+                        self.schedule_harvest(is_first=True)
+                        
+                    elif task.get("name") == "Flower_Harvest":
+                        if self.flower_queue:
+                            next_item = self.flower_queue[0]
+                            next_item["harvest_count"] -= 1
+                            
+                            if next_item["harvest_count"] > 0:
+                                # Nếu vẫn còn lượt thu hoạch, lên lịch thu hoạch tiếp theo sau 'inter' giây
+                                self.schedule_harvest(is_first=False)
+                            else:
+                                # Đã thu hoạch xong hết tất cả các lượt
+                                self.flower_queue.pop(0)
+                                self.schedule_next_flower()
                 else:
                     # Lượt tiếp theo tính từ lúc Task này vừa xong để đảm bảo khoảng cách an toàn
                     task["next_run"] = time.time() + task["interval"]
@@ -676,14 +894,17 @@ class AutoClickerInstance:
                 
             # Cập nhật trạng thái chờ cho UI
             if self.running:
-                wait_time = int(next_task_time - time.time())
-                if wait_time > 0:
-                    mins, secs = divmod(wait_time, 60)
-                    hrs, mins = divmod(mins, 60)
-                    time_str = f"{hrs:02d}:{mins:02d}:{secs:02d}" if hrs > 0 else f"{mins:02d}:{secs:02d}"
-                    self.update_status(f"Chờ {time_str}")
+                if next_task_time == float('inf'):
+                    self.update_status("Đang chờ lệnh...")
                 else:
-                    self.update_status("Chuẩn bị...")
+                    wait_time = int(next_task_time - time.time())
+                    if wait_time > 0:
+                        mins, secs = divmod(wait_time, 60)
+                        hrs, mins = divmod(mins, 60)
+                        time_str = f"{hrs:02d}:{mins:02d}:{secs:02d}" if hrs > 0 else f"{mins:02d}:{secs:02d}"
+                        self.update_status(f"Chờ {time_str}")
+                    else:
+                        self.update_status("Chuẩn bị...")
 
             time.sleep(1)
             
@@ -705,6 +926,12 @@ class MultiPremiumApp(ctk.CTk):
         self.adb_path = self.find_adb()
         self.ld_path = r"C:\LDPlayer\LDPlayer9\ldconsole.exe" # Mặc định
         
+        self.flower_list = get_flower_config()
+        self.flower_page = 0
+        self.flowers_per_page = 10
+        self.flower_queue = [] # Danh sách tối đa 5 hoa đang đợi trồng
+        self.show_selection = False # Trạng thái ẩn/hiện danh sách chọn
+
         # Assets (Sử dụng resource_path để đóng gói)
         self.logo_img = ctk.CTkImage(Image.open(resource_path("logo.png")), size=(80, 80))
         self.start_icon = ctk.CTkImage(Image.open(resource_path("start.png")), size=(25, 25))
@@ -751,6 +978,25 @@ class MultiPremiumApp(ctk.CTk):
         self.btn_stop = ctk.CTkButton(self.sidebar, text=" DỪNG TẤT CẢ", image=self.stop_icon, compound="left", command=self.stop_all, fg_color="#333", height=50, corner_radius=10)
         self.btn_stop.pack(padx=20, pady=10, fill="x")
 
+        # Task Management (QUẢN LÝ TÁC VỤ)
+        self.task_frame = ctk.CTkFrame(self.sidebar, fg_color=CARD_COLOR, corner_radius=10)
+        self.task_frame.pack(padx=20, pady=10, fill="x")
+        ctk.CTkLabel(self.task_frame, text="QUẢN LÝ TÁC VỤ", font=ctk.CTkFont(size=11, weight="bold"), text_color=ACCENT_GREEN).pack(pady=(5, 5))
+        
+        self.enabled_tasks = {
+            "Thuê Ngọc Trai": ctk.BooleanVar(value=True),
+            "Trồng hoa tươi trong hội": ctk.BooleanVar(value=True),
+            "Lấy vàng trong shop": ctk.BooleanVar(value=True),
+            "Giao hàng cư dân": ctk.BooleanVar(value=True),
+            "Giao hàng tại sảnh": ctk.BooleanVar(value=True),
+            "Trưng bày hoa": ctk.BooleanVar(value=True),
+            "Trồng hoa tự động": ctk.BooleanVar(value=True),
+        }
+        
+        for task_name, var in self.enabled_tasks.items():
+            cb = ctk.CTkCheckBox(self.task_frame, text=task_name, variable=var, font=ctk.CTkFont(size=11), checkbox_width=18, checkbox_height=18)
+            cb.pack(padx=10, pady=2, anchor="w")
+
         # Credit Footer
         ctk.CTkLabel(self.sidebar, text="Nguồn: RyoUTE - 0393203161", font=ctk.CTkFont(size=11), text_color="#666").pack(side="bottom", pady=20)
 
@@ -784,9 +1030,234 @@ class MultiPremiumApp(ctk.CTk):
         self.view_card = ctk.CTkFrame(self.main_content, fg_color=CARD_COLOR, corner_radius=15)
         self.view_card.pack(fill="both", expand=True)
         
-        # Log Display
-        self.log_textbox = ctk.CTkTextbox(self.view_card, font=("Consolas", 12), fg_color="#000", border_width=1, border_color="#333")
-        self.log_textbox.pack(fill="both", expand=True, padx=15, pady=15)
+        # Thay thế TabView bằng Frame trực tiếp để hiển thị Cấu hình trồng hoa
+        self.tab_flower = ctk.CTkFrame(self.view_card, fg_color="transparent")
+        self.tab_flower.pack(fill="both", expand=True, padx=5, pady=5)
+
+        # Flower UI Setup
+        self.setup_flower_ui()
+
+    def setup_flower_ui(self):
+        # 1. Khu vực hiển thị Hoa đang trồng (ACTIVE STATUS)
+        self.active_flower_card = ctk.CTkFrame(self.tab_flower, fg_color="#1A1A1A", corner_radius=15, border_width=1, border_color=ACCENT_GREEN)
+        self.active_flower_card.pack(fill="x", padx=20, pady=20)
+        
+        # Nội dung bên trong Active Card
+        self.update_active_flower_ui()
+
+        # 2. Khu vực Danh sách chọn hoa (Lúc đầu ẩn)
+        self.selection_container = ctk.CTkFrame(self.tab_flower, fg_color="transparent")
+        
+        # Tiêu đề danh sách
+        ctk.CTkLabel(self.selection_container, text=" DANH SÁCH CÁC LOẠI HOA ", font=ctk.CTkFont(size=15, weight="bold"), text_color=ACCENT_GREEN).pack(pady=(10, 10))
+
+        # Sử dụng ScrollableFrame chiếm trọn không gian
+        self.flower_scroll = ctk.CTkScrollableFrame(self.selection_container, fg_color="#101010", height=500, corner_radius=10, border_width=1, border_color="#333")
+        self.flower_scroll.pack(fill="both", expand=True, padx=20, pady=5)
+
+        # Flower Grid Frame bên trong Scroll
+        self.flower_grid = ctk.CTkFrame(self.flower_scroll, fg_color="transparent")
+        self.flower_grid.pack(fill="both", expand=True)
+        
+        # Pagination Control
+        pagin_frame = ctk.CTkFrame(self.selection_container, fg_color="transparent")
+        pagin_frame.pack(fill="x", side="bottom", pady=10)
+        
+        self.btn_prev_flower = ctk.CTkButton(pagin_frame, text="<", command=lambda: self.change_flower_page(-1), width=40)
+        self.btn_prev_flower.pack(side="left", padx=20)
+        
+        self.flower_page_lbl = ctk.CTkLabel(pagin_frame, text="Trang 1/1", font=ctk.CTkFont(weight="bold"))
+        self.flower_page_lbl.pack(side="left", expand=True)
+        
+        self.btn_next_flower = ctk.CTkButton(pagin_frame, text=">", command=lambda: self.change_flower_page(1), width=40)
+        self.btn_next_flower.pack(side="right", padx=20)
+        
+        # Ngay lập tức load dữ liệu lên table
+        self.update_flower_page()
+
+    def update_active_flower_ui(self):
+        # Clear cũ
+        for w in self.active_flower_card.winfo_children():
+            w.destroy()
+            
+        if not self.flower_queue:
+            inner = ctk.CTkFrame(self.active_flower_card, fg_color="transparent")
+            inner.pack(pady=20)
+            ctk.CTkLabel(inner, text="CHƯA CÓ HOA TRONG HÀNG ĐỢI", font=ctk.CTkFont(size=14, weight="bold"), text_color="#666").pack(side="left", padx=20)
+            ctk.CTkButton(inner, text=" + THÊM HOA VÀO HÀNG ĐỢI ", command=self.toggle_selection, fg_color=ACCENT_GREEN, text_color="#000", font=ctk.CTkFont(weight="bold"), height=30).pack(side="left")
+            return
+
+        # Hiển thị tiêu đề hàng đợi
+        header = ctk.CTkFrame(self.active_flower_card, fg_color="transparent")
+        header.pack(fill="x", padx=15, pady=(10, 5))
+        ctk.CTkLabel(header, text=f"HÀNG ĐỢI TRỒNG HOA ({len(self.flower_queue)}/5)", font=ctk.CTkFont(size=13, weight="bold"), text_color=ACCENT_GREEN).pack(side="left")
+        ctk.CTkButton(header, text=" + THÊM HOA ", command=self.toggle_selection, fg_color="#333", width=100, height=24, font=ctk.CTkFont(size=11)).pack(side="right", padx=5)
+        ctk.CTkButton(header, text=" DỪNG TẤT CẢ ", command=self.stop_flower_planting_all, fg_color=ACCENT_RED, width=100, height=24, font=ctk.CTkFont(size=11)).pack(side="right")
+
+        # Hiển thị từng hoa trong hàng đợi
+        for idx, f in enumerate(self.flower_queue):
+            content = ctk.CTkFrame(self.active_flower_card, fg_color="#222" if idx == 0 else "#1A1A1A", corner_radius=8)
+            content.pack(fill="x", padx=15, pady=2)
+            
+            # Số thứ tự
+            ctk.CTkLabel(content, text=f"{idx+1}.", font=ctk.CTkFont(size=12, weight="bold"), width=20).pack(side="left", padx=(10, 0))
+            
+            # 1. Icon
+            try:
+                img_path = resource_path(f["image"])
+                f_img = ctk.CTkImage(Image.open(img_path), size=(35, 35))
+                ctk.CTkLabel(content, image=f_img, text="").pack(side="left", padx=10)
+            except:
+                ctk.CTkLabel(content, text="[IMG]", font=ctk.CTkFont(size=10)).pack(side="left", padx=10)
+                
+            # 2. Thông tin chính
+            info_area = ctk.CTkFrame(content, fg_color="transparent")
+            info_area.pack(side="left", padx=10, expand=True, fill="x")
+            
+            name_color = ACCENT_GREEN if idx == 0 else "#EEE"
+            status_suffix = " (ĐANG TRỒNG)" if idx == 0 else " (ĐANG ĐỢI)"
+            ctk.CTkLabel(info_area, text=f.get("name", "Unknown").upper() + status_suffix, font=ctk.CTkFont(size=13, weight="bold"), text_color=name_color).pack(side="left")
+            
+            type_str = " | 1 lần" if f["type"] == 1 else f" | Còn {f.get('_remaining_cnt', f.get('_last_cnt', 1))}/{f.get('_last_cnt', 1)} lần ({f.get('_last_inter', 60)}s)"
+            ctk.CTkLabel(info_area, text=f"Thu hoạch: {type_str}", font=ctk.CTkFont(size=11), text_color="#AAA").pack(side="left", padx=15)
+            
+            ctk.CTkLabel(info_area, text=f"Chín: {f['growth_time']}s", font=ctk.CTkFont(size=11), text_color="#888").pack(side="left")
+
+    def toggle_selection(self):
+        if self.show_selection:
+            # Hiện Active Card, ẩn Selection
+            self.selection_container.pack_forget()
+            self.active_flower_card.pack(fill="x", padx=20, pady=20)
+            self.show_selection = False
+        else:
+            # Ẩn Active Card, hiện Selection
+            self.active_flower_card.pack_forget()
+            self.selection_container.pack(fill="both", expand=True, padx=5, pady=5)
+            self.show_selection = True
+            self.update_flower_page()
+
+    def update_flower_page(self):
+        # Dọn dẹp grid cũ
+        for w in self.flower_grid.winfo_children():
+            w.destroy()
+            
+        total_pages = (len(self.flower_list) + self.flowers_per_page - 1) // self.flowers_per_page
+        if total_pages == 0: total_pages = 1
+        self.flower_page_lbl.configure(text=f"Trang {self.flower_page + 1} / {total_pages}")
+        
+        start_idx = self.flower_page * self.flowers_per_page
+        end_idx = min(start_idx + self.flowers_per_page, len(self.flower_list))
+        page_flowers = self.flower_list[start_idx:end_idx]
+        
+        # 1. Header của Table (Tiêu đề các cột)
+        self.flower_grid.grid_columnconfigure(0, weight=0) # Icon
+        self.flower_grid.grid_columnconfigure(1, weight=1) # Tên
+        self.flower_grid.grid_columnconfigure(2, weight=1) # Cấu hình
+        self.flower_grid.grid_columnconfigure(3, weight=0) # Thao tác
+        
+        header_row = ctk.CTkFrame(self.flower_grid, fg_color="#2A2A2A", height=30, corner_radius=0)
+        header_row.pack(fill="x", pady=(0, 5))
+        
+        ctk.CTkLabel(header_row, text="ICON", font=ctk.CTkFont(size=11, weight="bold"), width=60).pack(side="left", padx=10)
+        ctk.CTkLabel(header_row, text="TÊN LOẠI HOA", font=ctk.CTkFont(size=11, weight="bold"), width=200, anchor="w").pack(side="left", padx=10)
+        ctk.CTkLabel(header_row, text="THÔNG SỐ THU HOẠCH", font=ctk.CTkFont(size=11, weight="bold"), width=300).pack(side="left", padx=10, expand=True)
+        ctk.CTkLabel(header_row, text="CHỌN", font=ctk.CTkFont(size=11, weight="bold"), width=100).pack(side="right", padx=10)
+
+        # 2. Danh sách các hàng (Items)
+        for i, flower in enumerate(page_flowers):
+            row = ctk.CTkFrame(self.flower_grid, fg_color="#1A1A1A" if i % 2 == 0 else "#222", corner_radius=0, height=45)
+            row.pack(fill="x", side="top", pady=1)
+            row.pack_propagate(False)
+            
+            # --- Cột 1: Icon ---
+            icon_f = ctk.CTkFrame(row, fg_color="transparent", width=60)
+            icon_f.pack(side="left", padx=(15, 5))
+            try:
+                img_path = resource_path(flower["image"])
+                f_img = ctk.CTkImage(Image.open(img_path), size=(30, 30))
+                ctk.CTkLabel(icon_f, image=f_img, text="").pack()
+            except:
+                ctk.CTkLabel(icon_f, text="[?]", font=ctk.CTkFont(size=10)).pack()
+            
+            # --- Cột 2: Tên Hoa ---
+            ctk.CTkLabel(row, text=flower["name"], font=ctk.CTkFont(size=12, weight="bold"), width=150, anchor="w").pack(side="left", padx=10)
+            
+            # --- Cột 3: Cấu hình (Hàng ngang) ---
+            conf_f = ctk.CTkFrame(row, fg_color="transparent")
+            conf_f.pack(side="left", expand=True, fill="x")
+            
+            if flower["type"] == 2:
+                in_inner = ctk.CTkFrame(conf_f, fg_color="transparent")
+                in_inner.pack(expand=True)
+                
+                ctk.CTkLabel(in_inner, text="H.hoạch:", font=ctk.CTkFont(size=10), text_color="#AAA").pack(side="left")
+                cnt = ctk.CTkEntry(in_inner, width=32, height=22, font=ctk.CTkFont(size=10))
+                cnt.insert(0, "3")
+                cnt.pack(side="left", padx=2)
+                flower["_cnt_entry"] = cnt
+                
+                ctk.CTkLabel(in_inner, text=" lần | Mỗi:", font=ctk.CTkFont(size=10), text_color="#AAA").pack(side="left")
+                inter = ctk.CTkEntry(in_inner, width=35, height=22, font=ctk.CTkFont(size=10))
+                inter.insert(0, "60")
+                inter.pack(side="left", padx=2)
+                flower["_inter_entry"] = inter
+                ctk.CTkLabel(in_inner, text=" s", font=ctk.CTkFont(size=10), text_color="#AAA").pack(side="left")
+            else:
+                ctk.CTkLabel(conf_f, text="| Thu hoạch 1 lần |", font=ctk.CTkFont(size=10, slant="italic"), text_color="#666").pack(expand=True)
+            
+            # --- Cột 4: Nút Trồng HOA ---
+            btn_plant = ctk.CTkButton(row, text="TRỒNG HOA", width=90, height=28, font=ctk.CTkFont(size=10, weight="bold"),
+                                     command=lambda f=flower: self.start_flower_planting(f), fg_color=ACCENT_GREEN, text_color="#000")
+            btn_plant.pack(side="right", padx=15)
+
+
+    def change_flower_page(self, delta):
+        total_pages = (len(self.flower_list) + self.flowers_per_page - 1) // self.flowers_per_page
+        new_page = self.flower_page + delta
+        if 0 <= new_page < total_pages:
+            self.flower_page = new_page
+            self.update_flower_page()
+
+    def start_flower_planting(self, flower):
+        if not self.active_workers:
+            self.add_log("CẢNH BÁO: Phải nhấn 'CHẠY TẤT CẢ' trước khi chọn hoa!")
+            return
+        
+        if len(self.flower_queue) >= 5:
+            self.add_log("CẢNH BÁO: Hàng đợi đã đầy (tối đa 5 loại hoa)!")
+            return
+
+        cnt = 1
+        inter = 60
+        if flower["type"] == 2:
+            try:
+                cnt = int(flower["_cnt_entry"].get())
+                inter = int(flower["_inter_entry"].get())
+            except: pass
+        
+        # Tạo bản sao thông tin hoa để lưu vào queue UI
+        f_task = flower.copy()
+        f_task["_last_cnt"] = cnt
+        f_task["_remaining_cnt"] = cnt # Khởi tạo số lần còn lại
+        f_task["_last_inter"] = inter
+        self.flower_queue.append(f_task)
+        
+        # Nếu đang ở chế độ xem selection thì quay lại active card
+        if self.show_selection:
+            self.toggle_selection()
+            
+        self.update_active_flower_ui()
+            
+        self.add_log(f"HỆ THỐNG: Đã thêm {flower['name']} vào hàng đợi của tất cả máy.")
+        for worker in self.active_workers:
+            worker.add_flower_task(flower, cnt, inter)
+
+    def stop_flower_planting_all(self):
+        self.add_log("HỆ THỐNG: Dừng và xóa sạch hàng đợi trồng hoa.")
+        self.flower_queue = []
+        self.update_active_flower_ui()
+        for worker in self.active_workers:
+            worker.stop_flower_task()
 
     def update_all_ui(self):
         def _update():
@@ -801,6 +1272,28 @@ class MultiPremiumApp(ctk.CTk):
                         text=worker.status, 
                         text_color=color
                     )
+            
+            # ĐỒNG BỘ HÀNG ĐỢI UI (Lấy máy đầu tiên làm chuẩn để hiển thị)
+            if self.active_workers and self.flower_queue:
+                worker0 = self.active_workers[0]
+                # Nếu máy 1 đã làm xong bớt hoa trong hàng đợi
+                if len(worker0.flower_queue) < len(self.flower_queue):
+                    # Cập nhật lại hàng đợi UI cho khớp với số lượng còn lại của máy
+                    diff = len(self.flower_queue) - len(worker0.flower_queue)
+                    for _ in range(diff):
+                        if self.flower_queue: self.flower_queue.pop(0)
+                    self.update_active_flower_ui()
+            
+            # 2. Đồng bộ số lần thu hoạch còn lại của hoa đang trồng (Lấy máy 1 làm chuẩn)
+            if self.active_workers and self.flower_queue:
+                w0 = self.active_workers[0]
+                if w0.flower_queue:
+                    ui_flower = self.flower_queue[0]
+                    wk_flower = w0.flower_queue[0]
+                    if ui_flower.get("_remaining_cnt") != wk_flower["harvest_count"]:
+                        ui_flower["_remaining_cnt"] = wk_flower["harvest_count"]
+                        self.update_active_flower_ui()
+
         self.after(0, _update)
 
     def save_config(self):
@@ -853,27 +1346,54 @@ class MultiPremiumApp(ctk.CTk):
             
             # Chỉ chạy lệnh adb devices để lấy danh sách thiết bị thực tế đang có
             res = subprocess.run([adb_path, "devices"], capture_output=True, text=True, timeout=10, creationflags=subprocess.CREATE_NO_WINDOW)
+            print(f"DEBUG ADB RAW: {res.stdout.strip()}")
             
             # Nếu ADB server chưa chạy, subprocess sẽ tự động start nó. 
             # Chỉ khi lỗi nặng mới cần kill-server thủ công.
             
             lines = res.stdout.strip().split('\n')
+            temp_serials = []
             for line in lines:
                 line = line.strip()
                 if not line or "List of devices attached" in line or "* daemon" in line:
                     continue
                 
-                parts = line.split() # Dùng split() để tách mọi loại khoảng trắng (tab/space)
+                parts = line.split()
                 if len(parts) >= 2:
                     serial = parts[0].strip()
                     status = parts[1].strip()
                     
                     if status == "device":
-                        device_serials.append(serial)
+                        temp_serials.append(serial)
                     elif status == "offline":
                         offline_count += 1
                     elif status == "unauthorized":
                         unauthorized_count += 1
+
+            # Lọc trùng lặp chuyên sâu (Dành cho LDPlayer: Console port và ADB port)
+            seen_instances = set()
+            for serial in temp_serials:
+                # Trích xuất port số
+                port_str = None
+                if "emulator-" in serial:
+                    port_str = serial.split("-")[-1]
+                elif ":" in serial:
+                    port_str = serial.split(":")[-1]
+                
+                if port_str and port_str.isdigit():
+                    p_val = int(port_str)
+                    # LDPlayer mặc định: Port 5554/5555 là máy 0, 5556/5557 là máy 1...
+                    # Chuẩn hóa về chỉ số máy: (port - 5554) // 2
+                    inst_idx = (p_val - 5554) // 2 if p_val >= 5554 else p_val
+                    
+                    if inst_idx not in seen_instances:
+                        seen_instances.add(inst_idx)
+                        device_serials.append(serial)
+                else:
+                    # Thiết bị thật hoặc không có port
+                    if serial not in seen_instances:
+                        seen_instances.add(serial)
+                        device_serials.append(serial)
             
         except Exception as e:
             self.add_log(f"LỖI: Không thể quét thiết bị: {str(e)}")
@@ -923,15 +1443,6 @@ class MultiPremiumApp(ctk.CTk):
         timestamp = datetime.now().strftime("%H:%M:%S")
         msg = f"[{timestamp}] {text}"
         print(msg)
-        if hasattr(self, "log_textbox"):
-             # Tự động xóa bớt log cũ nếu quá dài (> 2000 dòng) để tránh tràn RAM
-             log_content = self.log_textbox.get("1.0", "end")
-             if log_content.count("\n") > 2000:
-                 self.log_textbox.delete("1.0", "500.0") # Xóa 500 dòng đầu
-                 self.log_textbox.insert("1.0", "--- ĐÃ XÓA LOG CŨ ĐỂ TIẾT KIỆM RAM ---\n")
-                 
-             self.log_textbox.insert("end", msg + "\n")
-             self.log_textbox.see("end")
 
     def start_all(self):
         # Kiểm tra Hạn dùng trước khi chạy
@@ -966,6 +1477,8 @@ class MultiPremiumApp(ctk.CTk):
                 self.add_log,
                 self.update_all_ui
             )
+            # Truyền cấu hình checkbox vào worker
+            worker.enabled_tasks_vars = self.enabled_tasks
             
             # Nạp tất cả kịch bản từ hàm config riêng
             worker.setup_tasks()
