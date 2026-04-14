@@ -412,7 +412,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng cư dân", 
             script=[
-                {"action": "click_image", "target": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/nhiem_vu.png","target2": "images/nhiem_vu.jpg",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
                 {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
@@ -501,10 +501,10 @@ class AutoClickerInstance:
                                 },
                                 {
                                     "action": "if_exists",
-                                    "target": "images/x.png","target2": "images/x2.png","target3": "images/x5.jpg",
+                                    "target": "images/space1.png",
                                     "timeout": 3,
                                     "script": [
-                                        {"action": "click_image", "target": "images/x.png", "target2": "images/x2.png","target3": "images/x5.jpg"},
+                                        {"action": "click_image", "target": "images/space1.png", "confidence": 0.7},
                                         {"action": "wait", "timeout": 2},
                                         
                                     ]
@@ -544,7 +544,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
                 {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
                 {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
-                {"action": "click_image", "target": "images/trung_bay_hoa.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/trung_bay_hoa.png", "target1": "images/trung_bay_hoa1.jpg",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
