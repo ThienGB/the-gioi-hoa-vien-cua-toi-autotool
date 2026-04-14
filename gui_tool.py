@@ -1109,7 +1109,7 @@ class MultiPremiumApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("MegaUpLvCFTool(LD)")
-        self.geometry("1100x850")
+        self.geometry("1100x780")
         self.configure(fg_color=BG_COLOR)
         
         self.active_workers = [] # Các thread đang chạy
@@ -1142,28 +1142,28 @@ class MultiPremiumApp(ctk.CTk):
         self.sidebar = ctk.CTkFrame(self, width=280, corner_radius=0, fg_color=NAV_COLOR)
         self.sidebar.pack(side="left", fill="y")
         
-        ctk.CTkLabel(self.sidebar, image=self.logo_img, text="").pack(pady=(40,0))
-        self.logo_label = ctk.CTkLabel(self.sidebar, text="BẢNG ĐIỀU KHIỂN", font=ctk.CTkFont(size=22, weight="bold"), text_color=ACCENT_GREEN)
-        self.logo_label.pack(pady=(20, 0))
-        ctk.CTkLabel(self.sidebar, text="MegaUpLvCFTool(LD) v2.5", font=ctk.CTkFont(size=12)).pack(pady=(0, 20))
+        ctk.CTkLabel(self.sidebar, image=self.logo_img, text="").pack(pady=(20,0))
+        self.logo_label = ctk.CTkLabel(self.sidebar, text="BẢNG ĐIỀU KHIỂN", font=ctk.CTkFont(size=20, weight="bold"), text_color=ACCENT_GREEN)
+        self.logo_label.pack(pady=(10, 0))
+        ctk.CTkLabel(self.sidebar, text="MegaUpLvCFTool(LD) v2.5", font=ctk.CTkFont(size=11)).pack(pady=(0, 15))
 
         # LDPlayer Path Config
         self.path_card = ctk.CTkFrame(self.sidebar, fg_color=CARD_COLOR, corner_radius=10)
         self.path_card.pack(padx=20, pady=5, fill="x")
-        ctk.CTkLabel(self.path_card, text="ĐƯỜNG DẪN LDPLAYER", font=ctk.CTkFont(size=11, weight="bold")).pack(pady=(5, 0))
-        self.ld_path_entry = ctk.CTkEntry(self.path_card, placeholder_text="Ví dụ: C:\LDPlayer\LDPlayer9", height=30)
+        ctk.CTkLabel(self.path_card, text="ĐƯỜNG DẪN LDPLAYER", font=ctk.CTkFont(size=10, weight="bold")).pack(pady=(5, 0))
+        self.ld_path_entry = ctk.CTkEntry(self.path_card, placeholder_text="Ví dụ: C:\LDPlayer\LDPlayer9", height=28)
         self.ld_path_entry.pack(padx=10, pady=5, fill="x")
         self.ld_path_entry.insert(0, r"C:\LDPlayer\LDPlayer9")
         
-        self.save_button = ctk.CTkButton(self.path_card, text="Lưu Cấu Hình", command=self.save_config, height=30)
+        self.save_button = ctk.CTkButton(self.path_card, text="Lưu Cấu Hình", command=self.save_config, height=28)
         self.save_button.pack(padx=10, pady=10, fill="x")
 
 
         # Control
-        self.btn_start = ctk.CTkButton(self.sidebar, text=" CHẠY TẤT CẢ", image=self.start_icon, compound="left", command=self.start_all, height=50, corner_radius=10, font=ctk.CTkFont(size=16, weight="bold"))
-        self.btn_start.pack(padx=20, pady=(30, 10), fill="x")
-        self.btn_stop = ctk.CTkButton(self.sidebar, text=" DỪNG TẤT CẢ", image=self.stop_icon, compound="left", command=self.stop_all, fg_color="#333", height=50, corner_radius=10)
-        self.btn_stop.pack(padx=20, pady=10, fill="x")
+        self.btn_start = ctk.CTkButton(self.sidebar, text=" CHẠY TẤT CẢ", image=self.start_icon, compound="left", command=self.start_all, height=38, corner_radius=10, font=ctk.CTkFont(size=14, weight="bold"))
+        self.btn_start.pack(padx=20, pady=(20, 8), fill="x")
+        self.btn_stop = ctk.CTkButton(self.sidebar, text=" DỪNG TẤT CẢ", image=self.stop_icon, compound="left", command=self.stop_all, fg_color="#333", height=38, corner_radius=10)
+        self.btn_stop.pack(padx=20, pady=8, fill="x")
 
         # Task Management (QUẢN LÝ TÁC VỤ)
         self.task_frame = ctk.CTkFrame(self.sidebar, fg_color=CARD_COLOR, corner_radius=10)
