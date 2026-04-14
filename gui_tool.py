@@ -645,31 +645,6 @@ class AutoClickerInstance:
                 time.sleep(1)
             
         return True
-            
-            del screen
-            
-            if found_any:
-                # Nếu vừa xử lý xong 1 case, reset lại thời gian chờ để tiếp tục xử lý các case khác nếu có
-                start_loop_time = time.time() 
-                self.log(f"--- Đang quét lại vòng kế tiếp (Lần {iteration + 1}) ---")
-                time.sleep(0.5)
-                continue
-            else:
-                # Nếu không tìm thấy gì, kiểm tra xem đã hết thời gian chờ chưa
-                elapsed = time.time() - start_loop_time
-                if elapsed < timeout:
-                    if iteration % 3 == 0: # Giảm bớt log trùng lặp
-                        self.log(f"   [Đang đợi...] Chưa thấy trigger nào ({best_overall_name}: {best_overall_match:.2f}). Đã chờ {int(elapsed)}/{timeout}s")
-                    time.sleep(1)
-                    continue
-                else:
-                    if best_overall_match > 0.4:
-                        self.log(f"-> KẾT THÚC VÒNG LẶP: Hết thời gian chờ {timeout}s (Tốt nhất: {best_overall_name} {best_overall_match:.2f})")
-                    else:
-                        self.log(f"-> KẾT THÚC VÒNG LẶP: Hết {timeout}s không thấy trigger nào.")
-                    break
-            
-        return True
 
     def if_exists_logic(self, step):
         targets = []
