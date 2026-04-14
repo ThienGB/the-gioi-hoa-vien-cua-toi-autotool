@@ -573,9 +573,8 @@ class AutoClickerInstance:
         cases = step.get("cases", [])
         if not cases: return True
         
-        timeout = step.get("timeout", 10) # Mặc định chờ 10s để ít nhất 1 case xuất hiện
-        case_names = [os.path.basename(c.get("trigger", "unknown")) for c in cases]
-        self.log(f"BẮT ĐẦU VÒNG LẶP SỰ KIỆN: Đang đợi các trường hợp ({', '.join(case_names)}) - Timeout: {timeout}s")
+        timeout = step.get("timeout", 10) 
+        self.log(f"BẮT ĐẦU VÒNG LẶP SỰ KIỆN: Chờ tối đa {timeout}s...")
         
         start_loop_time = time.time()
         iteration = 0
@@ -593,31 +592,59 @@ class AutoClickerInstance:
             best_overall_name = ""
             
             for case in cases:
-                trigger = case.get("trigger")
+                # Thu thập tất cả triggers (trigger, trigger1, trigger2...)
+                triggers = []
+                if case.get("trigger"): triggers.append(case.get("trigger"))
+                idx = 1
+                while f"trigger{idx}" in case:
+                    triggers.append(case.get(f"trigger{idx}"))
+                    idx += 1
+                
                 sub_script = case.get("script", [])
                 confidence = case.get("confidence", 0.8)
                 
-                t_img = get_cached_image(trigger)
-                if t_img is None:
-                    self.log(f"LỖI: Không thể tải ảnh mẫu: {trigger}")
-                    continue
+                case_matched = False
+                for t_path in triggers:
+                    t_img = get_cached_image(t_path)
+                    if t_img is None: continue
+                    
+                    try:
+                        res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
+                        _, max_val, _, _ = cv2.minMaxLoc(res)
+                        del res
+                        
+                        if max_val > best_overall_match:
+                            best_overall_match = max_val
+                            best_overall_name = os.path.basename(t_path)
+                        
+                        if max_val >= confidence:
+                            self.log(f"-> PHÁT HIỆN BIẾN CỐ: {os.path.basename(t_path)} (Khớp: {max_val:.2f}/{confidence})")
+                            case_matched = True
+                            found_any = True
+                            break # Thoát vòng lặp triggers để thực hiện script
+                    except: continue
                 
-                # Đảm bảo template và screen có cùng kiểu dữ liệu
-                res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
-                _, max_val, _, _ = cv2.minMaxLoc(res)
-                del res
-                
-                if max_val > best_overall_match:
-                    best_overall_match = max_val
-                    best_overall_name = os.path.basename(trigger)
-                
-                if max_val >= confidence:
-                    self.log(f"-> PHÁT HIỆN BIẾN CỐ: {os.path.basename(trigger)} (Khớp: {max_val:.2f}/{confidence})")
-                    found_any = True
+                if case_matched:
                     for s_step in sub_script:
                         if not self.running: break
                         self.execute_step(s_step)
-                    break # Restart scan to handle priorities
+                    break # Thoát vòng lặp cases để chụp ảnh màn hình mới
+            
+            del screen
+            
+            if found_any:
+                start_loop_time = time.time() 
+                time.sleep(0.5)
+                continue
+            else:
+                elapsed = time.time() - start_loop_time
+                if elapsed >= timeout:
+                    if best_overall_match > 0.4:
+                        self.log(f"-> KẾT THÚC VÒNG LẶP: Hết thời gian (Tốt nhất: {best_overall_name} {best_overall_match:.2f})")
+                    break
+                time.sleep(1)
+            
+        return True
             
             del screen
             
@@ -645,61 +672,61 @@ class AutoClickerInstance:
         return True
 
     def if_exists_logic(self, step):
-        target = step.get("target")
+        targets = []
+        if step.get("target"): targets.append(step.get("target"))
+        idx = 1
+        while f"target{idx}" in step:
+            targets.append(step.get(f"target{idx}"))
+            idx += 1
+            
         sub_script = step.get("script", [])
         timeout = step.get("timeout", 0)
-        if not target: return True
+        if not targets: return True
         
-        target_name = os.path.basename(target)
-        self.log(f"Đang kiểm tra (if_exists): {target_name} (Chờ tối đa {timeout}s)")
+        target_names = [os.path.basename(t) for t in targets]
+        self.log(f"Đang kiểm tra (if_exists): {', '.join(target_names)} (Chờ tối đa {timeout}s)")
         
         start_time = time.time()
         found = False
-        t_img = get_cached_image(target)
-        if t_img is None:
-            self.log(f"LỖI: Không tìm thấy file ảnh mẫu: {target}")
-            return True # Bỏ qua if_exists nếu không có ảnh
-
         confidence = step.get("confidence", 0.8)
-        
         last_log_time = start_time
         
         while time.time() - start_time <= timeout or (timeout == 0 and found == False):
             screen = self.get_screenshot()
             if screen is not None:
-                # Bảo vệ chống lại lỗi kích thước hoặc kiểu dữ liệu
-                try:
-                    res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
-                    _, max_val, _, _ = cv2.minMaxLoc(res)
-                    del res
-                except Exception as e:
-                    self.log(f"LỖI OpenCV (if_exists): {e}")
-                    break
+                best_match = 0
+                for t_path in targets:
+                    t_img = get_cached_image(t_path)
+                    if t_img is None: continue
+                    try:
+                        res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
+                        _, max_val, _, _ = cv2.minMaxLoc(res)
+                        del res
+                        if max_val > best_match: best_match = max_val
+                        if max_val >= confidence:
+                            found = True
+                            break
+                    except: continue
                 
-                if max_val >= confidence:
-                    found = True
+                if found:
                     del screen
                     break
                     
                 cur_time = time.time()
                 if cur_time - last_log_time >= 2:
-                    if max_val > 0.4:
-                        self.log(f"   [Quét {target_name}] Cao nhất: {max_val:.2f}/{confidence}")
+                    if best_match > 0.4:
+                        self.log(f"   [if_exists] Chưa khớp (Max: {best_match:.2f}/{confidence})")
                     last_log_time = cur_time
-                    
                 del screen
             if timeout == 0: break
             time.sleep(0.5)
             
         if found:
-            self.log(f"-> ĐIỀU KIỆN ĐÚNG: Đã thấy {target_name}, thực hiện kịch bản con...")
+            self.log(f"-> ĐIỀU KIỆN ĐÚNG: Thực hiện kịch bản con...")
             for s_step in sub_script:
                 if not self.running: break
                 self.execute_step(s_step)
-            return True
-        else:
-            self.log(f"-> ĐIỀU KIỆN SAI: Hết giờ không thấy {target_name}, bỏ qua nhánh này.")
-            return True
+        return True
 
     def click_any_logic(self, step):
         delay = step.get("timeout", 0)
