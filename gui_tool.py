@@ -352,10 +352,10 @@ class AutoClickerInstance:
                 {"action": "loop_cases",
                     "cases": [
                         {
-                            "trigger": "images/plus.png","trigger1": "images/plus1.png"
+                            "trigger1": "images/plus.png", "trigger2": "images/plus1.png",
                             "script": [
-                                {"action": "click_image", "target": "images/plus.png" , "target2": "images/plus1.png"},
-                                {"action": "click_image_if", "target": "images/the_gioi.jpg", "timeout": 5},
+                                {"action": "click_image", "target1": "images/plus.png" , "target2": "images/plus1.png"},
+                                {"action": "click_image_if", "target": "images/the_gioi.png", "timeout": 5},
                                 {"action": "click_image", "target": "images/thue.png", "timeout": 10},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 5},
@@ -545,24 +545,25 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
                 {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
                 {"action": "click_image", "target": "images/trung_bay_hoa.png",  "timeout": 20},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
                 {"action": "wait", "timeout": 5},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
                 {"action": "wait", "timeout": 5},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
-                {"action": "click_coords", "x": 135, "y": 760}, 
+                {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
-                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
+                {"action": "click_image", "target": "images/space1.png",  "timeout": 20},
             ], 
             interval=60*48, 
             max_runs=-1
@@ -946,6 +947,7 @@ class AutoClickerInstance:
         # --- GIAI ĐOẠN 1: TRỒNG VÀ TƯỚI NƯỚC (Chạy nhanh, không đợi) ---
         script_plant = [
             {"action": "click_and_save_coords", "target": "images/dat_trong.png", "timeout": 20},
+            {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
             {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
             {"action": "wait", "timeout": 3},
             {"action": "click_coords", "x": 200, "y": 520}, # Click ô tìm kiếm
