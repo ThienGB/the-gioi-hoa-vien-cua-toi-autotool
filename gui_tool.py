@@ -354,7 +354,7 @@ class AutoClickerInstance:
                         {
                             "trigger": "images/plus.png",
                             "script": [
-                                {"action": "click_image", "target": "images/plus.png"},
+                                {"action": "click_image", "target": "images/plus.png" , "target2": "images/plus1.png"},
                                 {"action": "click_image_if", "target": "images/the_gioi.jpg", "timeout": 5},
                                 {"action": "click_image", "target": "images/thue.png", "timeout": 10},
                                 {"action": "wait", "timeout": 2},
@@ -364,7 +364,7 @@ class AutoClickerInstance:
                         }
                     ]
                 },
-                {"action": "click_image_if", "target1": "images/x.png", "target2": "images/x2.png", "timeout": 5},
+                {"action": "click_image_if", "target1": "images/space1.png", "target2": "images/space.png", "timeout": 5},
 
             ], 
             interval=60*60*2, # 1 phút 1 giây
@@ -414,13 +414,13 @@ class AutoClickerInstance:
             script=[
                 {"action": "click_image", "target": "images/nhiem_vu.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 7},
+                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
-                {"action": "wait", "timeout": 5},
+                {"action": "wait", "timeout": 2},
                 {
                     "action": "if_exists",
                     "target": "images/muon_xiu_roi_nhan.jpg",
-                    "timeout": 5,
+                    "timeout": 3,
                     "script": [
                         {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
                         {"action": "wait", "timeout": 2},
@@ -430,14 +430,14 @@ class AutoClickerInstance:
                     ]
                 },
                 {"action": "click_image", "target": "images/item2.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 7},
+                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
-                {"action": "wait", "timeout": 5},
+                {"action": "wait", "timeout": 2},
                 {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
                 {
                     "action": "if_exists",
                     "target": "images/muon_xiu_roi_nhan.jpg",
-                    "timeout": 5,
+                    "timeout": 3,
                     "script": [
                         {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
                         {"action": "wait", "timeout": 2},
