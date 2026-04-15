@@ -455,11 +455,19 @@ class AutoClickerInstance:
                         {"action": "click_image", "target": "images/x1.png", "timeout": 20},
                     ]
                 },
+                {
+                    "action": "if_exists",
+                    "target": "images/x_cu_dan.png",
+                    "timeout": 3,
+                    "script": [
+                        {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
+                    ]
+                },
                 {"action": "click_image", "target": "images/item2.png",  "timeout": 20},
                 {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
                 {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/x1.png",  "timeout": 3},
                 {
                     "action": "if_exists",
                     "target": "images/muon_xiu_roi_nhan.jpg",
@@ -472,6 +480,15 @@ class AutoClickerInstance:
                         {"action": "click_image", "target": "images/x1.png", "timeout": 20},
                     ]
                 },
+                {
+                    "action": "if_exists",
+                    "target": "images/x_cu_dan.png",
+                    "timeout": 3,
+                    "script": [
+                        {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
+                    ]
+                },
+                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
             ]
 
         self.add_task(
@@ -579,22 +596,22 @@ class AutoClickerInstance:
                 {"action": "click_image", "target": "images/trung_bay_hoa.png", "target1": "images/trung_bay_hoa1.jpg",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 100, "y": 740}, 
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 100, "y": 740}, 
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "wait", "timeout": 5},
                 {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
-                {"action": "wait", "timeout": 5},
-                {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
-                {"action": "wait", "timeout": 3},
-                {"action": "click_coords", "x": 100, "y": 740}, 
-                {"action": "click_image", "target": "images/bay_ban.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "click_image", "target": "images/space1.png",  "timeout": 20},
             ], 
             interval=60*48, 
