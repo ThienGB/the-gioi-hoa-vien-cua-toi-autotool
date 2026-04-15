@@ -370,7 +370,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target1": "images/space1.png", "target2": "images/space.png", "timeout": 5},
 
             ], 
-            interval=60*60*2, # 1 phút 1 giây
+            interval=60*16, # 1 phút 1 giây
             max_runs=-1  # -1 là lặp vô tận
         )
 
@@ -378,37 +378,37 @@ class AutoClickerInstance:
         self.add_task(
             name="Trồng hoa tươi trong hội", 
             script=[
-                {"action": "click_image", "target": "images/hoi1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/hoi1.png",  "timeout": 20},
                 {"action": "click_image_if", "target1": "images/x.png", "target2": "images/x2.png", "timeout": 5},
-                {"action": "click_image", "target": "images/trong_hoa_tuoi1.png",  "timeout": 20},
-                {"action": "click_image", "target": "images/tat_ca_thu_hoach.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/trong_hoa_tuoi1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/tat_ca_thu_hoach.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
-                {"action": "click_image", "target": "images/thoat_trong_cay.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/thoat_trong_cay.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/thoat_hoi1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/thoat_hoi1.png",  "timeout": 20},
 
             ], 
-            interval=60*60*1.5, 
+            interval=60*21, 
             max_runs=-1
         )
         # Task 3: Mua ở Shop
         self.add_task(
             name="Lấy vàng trong shop", 
             script=[
-                {"action": "click_image", "target": "images/multi.png",  "timeout": 20},
-                {"action": "click_image", "target": "images/tiem1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/multi.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/tiem1.png",  "timeout": 20},
                 {"action": "wait", "timeout": 5},
-                {"action": "click_image", "target": "images/tiem_nguyen_lieu.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/tiem_nguyen_lieu.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
-                {"action": "click_image", "target": "images/mua_nhanh.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/mua_nhanh.png",  "timeout": 20},
                 {"action": "wait", "timeout": 3},
                 
                 {"action": "click_image_if", "target": "images/xac_nhan1.png",  "timeout": 5},
                 {"action": "wait", "timeout": 5},
 
-                {"action": "click_image", "target": "images/thoat_tiem.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/thoat_tiem.png",  "timeout": 20},
             ], 
-            interval=60*60*2.5, 
+            interval=60*31, 
             max_runs=-1
         )
         # Task 4: Giao hàng cư dân
@@ -583,7 +583,7 @@ class AutoClickerInstance:
                     ]
                 }
             ], 
-            interval=120, 
+            interval=61, 
             max_runs=-1
         )
         # Task 6: Trưng bày hoa
@@ -614,7 +614,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "click_image", "target": "images/space1.png",  "timeout": 20},
             ], 
-            interval=60*48, 
+            interval=60*25, 
             max_runs=-1
         )
 
@@ -979,8 +979,8 @@ class AutoClickerInstance:
         })
 
     def add_flower_task(self, flower_info, harvest_count=1, harvest_interval=60):
-        if len(self.flower_queue) >= 5:
-            self.log(f"CẢNH BÁO: Hàng đợi hoa đã đầy (5/5). Không thể thêm {flower_info['name']}.")
+        if len(self.flower_queue) >= 50:
+            self.log(f"CẢNH BÁO: Hàng đợi hoa đã đầy (50/50). Không thể thêm {flower_info['name']}.")
             return
             
         self.flower_queue.append({
@@ -988,7 +988,7 @@ class AutoClickerInstance:
             "harvest_count": harvest_count,
             "harvest_interval": harvest_interval
         })
-        self.log(f"ĐÃ THÊM HÀNG ĐỢI: {flower_info['name']} ({len(self.flower_queue)}/5)")
+        self.log(f"ĐÃ THÊM HÀNG ĐỢI: {flower_info['name']} ({len(self.flower_queue)}/50)")
         
         # Nếu chưa có task trồng hoa nào đang chạy thì kích hoạt hoa đầu tiên
         has_flower_task = any(t.get("name") in ["Flower_Plant", "Flower_Harvest"] for t in self.tasks)
@@ -1268,24 +1268,24 @@ class MultiPremiumApp(ctk.CTk):
 
         # 2. Main Area
         self.main_content = ctk.CTkFrame(self, fg_color="transparent")
-        self.main_content.pack(side="right", fill="both", expand=True, padx=25, pady=25)
+        self.main_content.pack(side="right", fill="both", expand=True, padx=20, pady=(5, 20))
 
         # Instance Selection Card
         self.inst_frame = ctk.CTkFrame(self.main_content, fg_color=CARD_COLOR, corner_radius=15, border_width=1, border_color="#333")
-        self.inst_frame.pack(fill="x", pady=(0, 20))
+        self.inst_frame.pack(fill="x", pady=(0, 2))
         inst_header = ctk.CTkFrame(self.inst_frame, fg_color="transparent")
-        inst_header.pack(fill="x", padx=20, pady=10)
-        ctk.CTkLabel(inst_header, text="THIẾT BỊ ĐANG MỞ", font=ctk.CTkFont(size=14, weight="bold"), text_color=ACCENT_GREEN).pack(side="left")
+        inst_header.pack(fill="x", padx=15, pady=1)
+        ctk.CTkLabel(inst_header, text="THIẾT BỊ ĐANG MỞ", font=ctk.CTkFont(size=11, weight="bold"), text_color=ACCENT_GREEN).pack(side="left")
 
         # Action Buttons for Instances
         btns_frame = ctk.CTkFrame(inst_header, fg_color="transparent")
         btns_frame.pack(side="right")
         # Nút chọn tất cả được gỡ bỏ vì người dùng muốn chạy tất cả máy mà không cần check
-        self.btn_refresh = ctk.CTkButton(btns_frame, text="Làm Mới Danh Sách", command=self.scan_devices, height=26, width=120, font=ctk.CTkFont(size=11, weight="bold"))
+        self.btn_refresh = ctk.CTkButton(btns_frame, text="Làm Mới Danh Sách", command=self.scan_devices, height=22, width=110, font=ctk.CTkFont(size=10, weight="bold"))
         self.btn_refresh.pack(side="left", padx=5)
 
-        self.device_list_frame = ctk.CTkScrollableFrame(self.inst_frame, height=180, fg_color="transparent") 
-        self.device_list_frame.pack(fill="x", padx=10, pady=(0, 15))
+        self.device_list_frame = ctk.CTkScrollableFrame(self.inst_frame, height=40, fg_color="transparent") 
+        self.device_list_frame.pack(fill="x", padx=10, pady=(0, 2))
         # Tăng số cột lên 12 và cấu hình cột đều nhau
         for col in range(12): 
             self.device_list_frame.grid_columnconfigure(col, weight=1)
@@ -1306,11 +1306,24 @@ class MultiPremiumApp(ctk.CTk):
     def setup_flower_ui(self):
         # 1. Khu vực hiển thị Hoa đang trồng (ACTIVE STATUS)
         self.active_flower_card = ctk.CTkFrame(self.tab_flower, fg_color="#1A1A1A", corner_radius=15, border_width=1, border_color=ACCENT_GREEN)
-        self.active_flower_card.pack(fill="x", padx=20, pady=(20, 10))
+        self.active_flower_card.pack(fill="x", padx=20, pady=(10, 5))
+        
+        # Tạo sẵn cấu trúc tĩnh để tránh rebuild gây giật
+        self.flower_header = ctk.CTkFrame(self.active_flower_card, fg_color="transparent")
+        self.flower_header.pack(fill="x", padx=15, pady=(10, 5))
+        self.lbl_queue_count = ctk.CTkLabel(self.flower_header, text="HÀNG ĐỢI TRỒNG HOA (0/50)", font=ctk.CTkFont(size=13, weight="bold"), text_color=ACCENT_GREEN)
+        self.lbl_queue_count.pack(side="left")
+        ctk.CTkButton(self.flower_header, text=" DỪNG TẤT CẢ ", command=self.stop_flower_planting_all, fg_color=ACCENT_RED, width=120, height=28, font=ctk.CTkFont(size=11, weight="bold")).pack(side="right")
+
+        self.flower_scroll = ctk.CTkScrollableFrame(self.active_flower_card, fg_color="transparent", height=160)
+        self.flower_scroll.pack(fill="both", expand=True, padx=5, pady=(0, 5))
+        
+        self.flower_ui_items = []
+        self._last_queue_key = ""
         
         # 2. Khu vực Form nhập liệu (Manual Input)
         self.input_card = ctk.CTkFrame(self.tab_flower, fg_color=CARD_COLOR, corner_radius=15, border_width=1, border_color="#333")
-        self.input_card.pack(fill="x", padx=20, pady=10)
+        self.input_card.pack(fill="x", padx=20, pady=5)
         
         header = ctk.CTkFrame(self.input_card, fg_color="transparent")
         header.pack(fill="x", padx=20, pady=(15, 10))
@@ -1343,10 +1356,13 @@ class MultiPremiumApp(ctk.CTk):
         self.ent_harvest_interval.pack(pady=(5, 0))
         self.ent_harvest_interval.insert(0, "60")
         
-        # Nút THÊM
-        self.btn_add_manual = ctk.CTkButton(form_frame, text=" + THÊM ", width=100, height=35, fg_color=ACCENT_GREEN, text_color="#000", 
+        # Nút THÊM (Cột 4)
+        col4 = ctk.CTkFrame(form_frame, fg_color="transparent")
+        col4.pack(side="right", padx=(10, 0))
+        ctk.CTkLabel(col4, text="", font=ctk.CTkFont(size=11)).pack(anchor="w")
+        self.btn_add_manual = ctk.CTkButton(col4, text=" + THÊM ", width=100, height=35, fg_color=ACCENT_GREEN, text_color="#000", 
                                             font=ctk.CTkFont(weight="bold"), command=self.add_manual_flower)
-        self.btn_add_manual.pack(side="right", pady=(20, 0))
+        self.btn_add_manual.pack(pady=(5, 0))
 
         # --- LỊCH SỬ ĐÃ NHẬP ---
         self.history_card = ctk.CTkFrame(self.input_card, fg_color="transparent")
@@ -1421,7 +1437,7 @@ class MultiPremiumApp(ctk.CTk):
         # Tạo flower object giả lập để dùng cho logic add_flower_task
         flower_obj = {"name": name}
         
-        if len(self.flower_queue) >= 5:
+        if len(self.flower_queue) >= 50:
             self.add_log("CẢNH BÁO: Hàng đợi trồng hoa đã đầy (5/5)!")
             return
 
@@ -1442,36 +1458,57 @@ class MultiPremiumApp(ctk.CTk):
         self.ent_flower_name.delete(0, 'end') # Xóa để nhập cái tiếp theo
 
     def update_active_flower_ui(self):
-        # Dọn dẹp card cũ
-        for w in self.active_flower_card.winfo_children():
-            w.destroy()
+        # Tạo key để kiểm tra xem cấu trúc hàng đợi có thực sự thay đổi không
+        queue_names = [f.get("name", "Unknown") for f in self.flower_queue]
+        queue_key = "|".join(queue_names) + f"_{len(self.flower_queue)}"
+        
+        # Nếu cấu trúc hàng đợi thay đổi (thêm/bớt/đổi tên) -> Chỉ rebuild bên trong scroll frame
+        if queue_key != getattr(self, "_last_queue_key", ""):
+            self._last_queue_key = queue_key
             
-        if not self.flower_queue:
-            ctk.CTkLabel(self.active_flower_card, text="CHƯA CÓ HOA TRONG HÀNG ĐỢI", font=ctk.CTkFont(size=14, weight="bold"), text_color="#666").pack(pady=30)
-            return
+            # Xóa các item cũ trong scroll frame
+            for w in self.flower_scroll.winfo_children():
+                w.destroy()
+            self.flower_ui_items = []
+                
+            if not self.flower_queue:
+                ctk.CTkLabel(self.flower_scroll, text="CHƯA CÓ HOA TRONG HÀNG ĐỢI", font=ctk.CTkFont(size=14, weight="bold"), text_color="#666").pack(pady=30)
+            else:
+                for idx, f in enumerate(self.flower_queue):
+                    content = ctk.CTkFrame(self.flower_scroll, fg_color="#222" if idx == 0 else "#1A1A1A", corner_radius=8)
+                    content.pack(fill="x", padx=5, pady=2)
+                    ctk.CTkLabel(content, text=f"{idx+1}.", font=ctk.CTkFont(size=12, weight="bold"), width=30).pack(side="left", padx=10)
+                    
+                    info_area = ctk.CTkFrame(content, fg_color="transparent")
+                    info_area.pack(side="left", padx=10, expand=True, fill="x")
+                    
+                    name_color = ACCENT_GREEN if idx == 0 else "#EEE"
+                    lbl_name = ctk.CTkLabel(info_area, text="", font=ctk.CTkFont(size=13, weight="bold"), text_color=name_color)
+                    lbl_name.pack(side="left")
+                    
+                    lbl_status = ctk.CTkLabel(info_area, text="", font=ctk.CTkFont(size=11), text_color="#AAA")
+                    lbl_status.pack(side="right", padx=15)
+                    
+                    self.flower_ui_items.append({"name": lbl_name, "status": lbl_status})
 
-        header = ctk.CTkFrame(self.active_flower_card, fg_color="transparent")
-        header.pack(fill="x", padx=15, pady=(10, 5))
-        ctk.CTkLabel(header, text=f"HÀNG ĐỢI TRỒNG HOA ({len(self.flower_queue)}/5)", font=ctk.CTkFont(size=13, weight="bold"), text_color=ACCENT_GREEN).pack(side="left")
-        ctk.CTkButton(header, text=" DỪNG TẤT CẢ ", command=self.stop_flower_planting_all, fg_color=ACCENT_RED, width=120, height=28, font=ctk.CTkFont(size=11, weight="bold")).pack(side="right")
+        # --- PHẦN UPDATE DATA (Luôn mượt vì chỉ update text) ---
+        if hasattr(self, "lbl_queue_count"):
+             self.lbl_queue_count.configure(text=f"HÀNG ĐỢI TRỒNG HOA ({len(self.flower_queue)}/50)")
 
         for idx, f in enumerate(self.flower_queue):
-            content = ctk.CTkFrame(self.active_flower_card, fg_color="#222" if idx == 0 else "#1A1A1A", corner_radius=8)
-            content.pack(fill="x", padx=15, pady=2)
-            ctk.CTkLabel(content, text=f"{idx+1}.", font=ctk.CTkFont(size=12, weight="bold"), width=30).pack(side="left", padx=10)
-            
-            info_area = ctk.CTkFrame(content, fg_color="transparent")
-            info_area.pack(side="left", padx=10, expand=True, fill="x")
-            
-            name_color = ACCENT_GREEN if idx == 0 else "#EEE"
-            status_suffix = " (ĐANG TRỒNG)" if idx == 0 else " (ĐANG ĐỢI)"
-            ctk.CTkLabel(info_area, text=f.get("name", "Unknown").upper() + status_suffix, font=ctk.CTkFont(size=13, weight="bold"), text_color=name_color).pack(side="left")
-            
-            cnt = f.get('_remaining_cnt', f.get('_last_cnt', 1))
-            total = f.get('_last_cnt', 1)
-            inter = f.get('_last_inter', 60)
-            status_str = f"Lần {total - cnt + 1}/{total} (Mỗi {inter}s)"
-            ctk.CTkLabel(info_area, text=status_str, font=ctk.CTkFont(size=11), text_color="#AAA").pack(side="right", padx=15)
+            if idx < len(self.flower_ui_items):
+                status_suffix = " (ĐANG TRỒNG)" if idx == 0 else " (ĐANG ĐỢI)"
+                name_text = f.get("name", "Unknown").upper() + status_suffix
+                # Chỉ configure nếu text thực sự khác để tối ưu
+                if self.flower_ui_items[idx]["name"].cget("text") != name_text:
+                    self.flower_ui_items[idx]["name"].configure(text=name_text)
+                
+                cnt = f.get('_remaining_cnt', f.get('_last_cnt', 1))
+                total = f.get('_last_cnt', 1)
+                inter = f.get('_last_inter', 60)
+                status_str = f"Lần {total - cnt + 1}/{total} (Mỗi {inter}s)"
+                if self.flower_ui_items[idx]["status"].cget("text") != status_str:
+                    self.flower_ui_items[idx]["status"].configure(text=status_str)
 
     def stop_flower_planting_all(self):
         self.add_log("HỆ THỐNG: Dừng và xóa sạch hàng đợi trồng hoa.")
@@ -1640,15 +1677,15 @@ class MultiPremiumApp(ctk.CTk):
         for i, serial in enumerate(device_serials):
             card = ctk.CTkFrame(self.device_list_frame, fg_color="#252525", corner_radius=6, border_width=1, border_color="#383838")
             # Sắp xếp 12 máy trên 1 hàng để tối ưu không gian
-            card.grid(row=i // 12, column=i % 12, padx=3, pady=3, sticky="nsew")
+            card.grid(row=i // 12, column=i % 12, padx=1, pady=1, sticky="nsew")
             
-            # Tách lấy port hoặc phần số cuối cùng của Serial (Ví dụ: emulator-5554 -> 5554, 127.0.0.1:5556 -> 5556)
+            # Tách lấy port hoặc phần số cuối cùng của Serial
             display_name = serial.replace("emulator-", "").split(":")[-1]
-            name_lbl = ctk.CTkLabel(card, text=display_name, font=ctk.CTkFont(size=10, weight="bold"))
-            name_lbl.pack(pady=(5, 0))
+            name_lbl = ctk.CTkLabel(card, text=display_name, font=ctk.CTkFont(size=9, weight="bold"))
+            name_lbl.pack(pady=(2, 0))
             
-            status_lbl = ctk.CTkLabel(card, text="Sẵn sàng", font=ctk.CTkFont(size=9), text_color="#666")
-            status_lbl.pack(pady=(0, 5))
+            status_lbl = ctk.CTkLabel(card, text="Sẵn sàng", font=ctk.CTkFont(size=8), text_color="#666")
+            status_lbl.pack(pady=(0, 2))
             
             self.device_cards[serial] = {"card": card, "status": status_lbl}
 
