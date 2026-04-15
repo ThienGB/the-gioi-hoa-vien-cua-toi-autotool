@@ -291,6 +291,9 @@ class AutoClickerInstance:
             return self.click_and_save_coords_logic(step)
         elif action == "click_saved_coords":
             res = self.click_saved_coords_logic(step)
+        elif action == "log":
+            self.log(step.get("text", ""))
+            res = True
         
         # Kiểm tra lag: Nếu 1 bước mất hơn 35s
         duration = time.time() - self.last_step_time
@@ -409,10 +412,33 @@ class AutoClickerInstance:
             max_runs=-1
         )
         # Task 4: Giao hàng cư dân
-        self.add_task(
-            name="Giao hàng cư dân", 
-            script=[
-                {"action": "click_image", "target": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+        delivery_mode = "item_1_2"
+        if self.enabled_tasks_vars and "delivery_mode" in self.enabled_tasks_vars:
+            delivery_mode = self.enabled_tasks_vars["delivery_mode"].get()
+
+        if delivery_mode == "all":
+            # Kịch bản giao hết (Người dùng sẽ tự làm sau)
+            resident_script = [
+                {"action": "click_image", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "wait", "timeout": 2},
+                {"action": "loop_cases",
+                    "max_loops": 8,
+                    "cases": [
+                        {
+                            "trigger": "images/gui.png",
+                            "script": [
+                                {"action": "click_image", "target": "images/gui.png"},
+                                {"action": "wait", "timeout": 2}
+                            ]
+                        }
+                    ]
+                },
+                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
+            ]
+        else:
+            # Kịch bản hiện tại: Chỉ giao item1, item2
+            resident_script = [
+                {"action": "click_image", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
                 {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
@@ -446,7 +472,11 @@ class AutoClickerInstance:
                         {"action": "click_image", "target": "images/x1.png", "timeout": 20},
                     ]
                 },
-            ], 
+            ]
+
+        self.add_task(
+            name="Giao hàng cư dân", 
+            script=resident_script, 
             interval=66, 
             max_runs=100
         )
@@ -460,18 +490,18 @@ class AutoClickerInstance:
                     "cases": [
                         {
                             "trigger1": "images/do.png","trigger2": "images/do.jpg",
-                            "confidence": 0.7,
+                            "confidence": 0.8,
                             "script": [
-                                {"action": "click_image", "target": "images/do.png","target2": "images/do.jpg", "confidence": 0.7},
+                                {"action": "click_image", "target1": "images/do.png","target2": "images/do.jpg", "confidence": 0.8},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image", "target": "images/chua_co_hang.png"}
                             ]
                         },
                         {
                             "trigger": "images/vang.png",
-                            "confidence": 0.7,
+                            "confidence": 0.8,
                             "script": [
-                                {"action": "click_image", "target": "images/vang.png", "confidence": 0.7},
+                                {"action": "click_image", "target": "images/vang.png", "confidence": 0.8},
                                 {"action": "wait", "timeout": 2},
                                 {
                                     "action": "if_exists",
@@ -491,9 +521,11 @@ class AutoClickerInstance:
                                 },
                                 {
                                     "action": "if_exists",
-                                    "target": "images/next.png",
+                                    "target": "images/tiep_tuc.png",
                                     "timeout": 3,
                                     "script": [
+                                        {"action": "click_image", "target": "images/tiep_tuc.png"},
+                                        {"action": "wait", "timeout": 2},
                                         {"action": "click_image", "target": "images/bo_qua.png"},
                                         {"action": "wait", "timeout": 2},
                                         {"action": "click_any", "timeout": 3},
@@ -512,10 +544,10 @@ class AutoClickerInstance:
                             ]
                         },
                         {
-                            "trigger": "images/xanh.png",
-                            "confidence": 0.7,
+                            "trigger1": "images/xanh.png", "trigger2": "images/xanh2.png",
+                            "confidence": 0.8,
                             "script": [
-                                {"action": "click_image", "target": "images/xanh.png", "confidence": 0.7},
+                                {"action": "click_image", "target1": "images/xanh.png", "target2": "images/xanh2.png", "confidence": 0.8},
                                 {"action": "click_image", "target": "images/giao.png"},
                                 {"action": "click_any", "timeout": 3},
                                 {
@@ -574,14 +606,26 @@ class AutoClickerInstance:
         cases = step.get("cases", [])
         if not cases: return True
         
-        timeout = step.get("timeout", 10) 
-        self.log(f"BẮT ĐẦU VÒNG LẶP SỰ KIỆN: Chờ tối đa {timeout}s...")
+        timeout = step.get("timeout", 10)
+        max_loops = step.get("max_loops", -1)  # -1 = không giới hạn
+        
+        log_msg = f"BẮT ĐẦU VÒNG LẶP SỰ KIỆN: Chờ tối đa {timeout}s"
+        if max_loops != -1:
+            log_msg += f", tối đa {max_loops} lần khớp"
+        self.log(log_msg + "...")
         
         start_loop_time = time.time()
         iteration = 0
+        loops_matched = 0  # Đếm số lần đã khớp và thực thi thành công
         
         while self.running:
             iteration += 1
+            
+            # Kiểm tra giới hạn số lần lặp
+            if max_loops != -1 and loops_matched >= max_loops:
+                self.log(f"-> KẾT THÚC VÒNG LẶP: Đã đạt giới hạn {max_loops} lần.")
+                break
+            
             found_any = False
             screen = self.get_screenshot()
             
@@ -629,6 +673,7 @@ class AutoClickerInstance:
                     for s_step in sub_script:
                         if not self.running: break
                         self.execute_step(s_step)
+                    loops_matched += 1  # Tăng bộ đếm mỗi lần khớp
                     break # Thoát vòng lặp cases để chụp ảnh màn hình mới
             
             del screen
@@ -1187,6 +1232,19 @@ class MultiPremiumApp(ctk.CTk):
         for task_name, var in self.enabled_tasks.items():
             cb = ctk.CTkCheckBox(self.task_frame, text=task_name, variable=var, font=ctk.CTkFont(size=11), checkbox_width=18, checkbox_height=18)
             cb.pack(padx=10, pady=2, anchor="w")
+            
+            if task_name == "Giao hàng cư dân":
+                self.delivery_mode_var = ctk.StringVar(value="item_1_2")
+                mode_frame = ctk.CTkFrame(self.task_frame, fg_color="transparent")
+                mode_frame.pack(padx=(30, 0), pady=(0, 5), anchor="w")
+                
+                rb1 = ctk.CTkRadioButton(mode_frame, text="Item 1, 2", variable=self.delivery_mode_var, value="item_1_2", font=ctk.CTkFont(size=10), radiobutton_width=14, radiobutton_height=14)
+                rb1.pack(side="left", padx=(0, 10))
+                
+                rb2 = ctk.CTkRadioButton(mode_frame, text="Giao hết", variable=self.delivery_mode_var, value="all", font=ctk.CTkFont(size=10), radiobutton_width=14, radiobutton_height=14)
+                rb2.pack(side="left")
+
+        self.enabled_tasks["delivery_mode"] = self.delivery_mode_var
 
         # Credit Footer
         ctk.CTkLabel(self.sidebar, text="Nguồn: RyoUTE - 0393203161", font=ctk.CTkFont(size=11), text_color="#666").pack(side="bottom", pady=20)
