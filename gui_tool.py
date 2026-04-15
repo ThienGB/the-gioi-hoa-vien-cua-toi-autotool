@@ -412,9 +412,9 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng cư dân", 
             script=[
-                {"action": "click_image", "target": "images/nhiem_vu.png","target2": "images/nhiem_vu.jpg",  "timeout": 20},
+                {"action": "click_image", "target": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 3},
+                {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
                 {"action": "wait", "timeout": 2},
                 {
@@ -430,7 +430,7 @@ class AutoClickerInstance:
                     ]
                 },
                 {"action": "click_image", "target": "images/item2.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_mien_phi.jpg",  "timeout": 3},
+                {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
@@ -459,10 +459,10 @@ class AutoClickerInstance:
                     "action": "loop_cases",
                     "cases": [
                         {
-                            "trigger": "images/do.png",
+                            "trigger1": "images/do.png","trigger2": "images/do.jpg",
                             "confidence": 0.7,
                             "script": [
-                                {"action": "click_image", "target": "images/do.png", "confidence": 0.7},
+                                {"action": "click_image", "target": "images/do.png","target2": "images/do.jpg", "confidence": 0.7},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image", "target": "images/chua_co_hang.png"}
                             ]
