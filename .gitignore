@@ -31,3 +31,6 @@ dist/
 .idea/
 *.swp
 *.swo
+
+# Agent
+.agent/
