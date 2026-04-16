@@ -1176,7 +1176,7 @@ class AutoClickerInstance:
 class MultiPremiumApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("MegaUpLvCFTool(LD)")
+        self.title("Tool Mr Thanh - Thế Giới Hoa Viên")
         self.geometry("1100x780")
         self.configure(fg_color=BG_COLOR)
         
@@ -1213,7 +1213,7 @@ class MultiPremiumApp(ctk.CTk):
         ctk.CTkLabel(self.sidebar, image=self.logo_img, text="").pack(pady=(20,0))
         self.logo_label = ctk.CTkLabel(self.sidebar, text="BẢNG ĐIỀU KHIỂN", font=ctk.CTkFont(size=20, weight="bold"), text_color=ACCENT_GREEN)
         self.logo_label.pack(pady=(10, 0))
-        ctk.CTkLabel(self.sidebar, text="MegaUpLvCFTool(LD) v2.5", font=ctk.CTkFont(size=11)).pack(pady=(0, 15))
+        ctk.CTkLabel(self.sidebar, text="Tool Mr Thanh - Thế Giới Hoa Viên", font=ctk.CTkFont(size=11)).pack(pady=(0, 15))
 
         # LDPlayer Path Config
         self.path_card = ctk.CTkFrame(self.sidebar, fg_color=CARD_COLOR, corner_radius=10)
