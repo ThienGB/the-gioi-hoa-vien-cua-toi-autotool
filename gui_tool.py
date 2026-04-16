@@ -352,6 +352,8 @@ class AutoClickerInstance:
             script=[
                 {"action": "click_image", "target": "images/ngoc_trai.png", "timeout": 10},
                 {"action": "click_image_if", "target": "images/thu_hoach.png", "timeout": 3},
+                {"action": "wait", "timeout": 2},
+                {"action": "click_any", "timeout": 3},
                 {"action": "loop_cases",
                     "cases": [
                         {
@@ -401,7 +403,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/tiem_nguyen_lieu.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_image_if", "target": "images/mua_nhanh.png",  "timeout": 20},
-                {"action": "wait", "timeout": 3},
+                {"action": "wait", "timeout": 5},
                 
                 {"action": "click_image_if", "target": "images/xac_nhan1.png",  "timeout": 5},
                 {"action": "wait", "timeout": 5},
@@ -419,7 +421,7 @@ class AutoClickerInstance:
         if delivery_mode == "all":
             # Kịch bản giao hết (Người dùng sẽ tự làm sau)
             resident_script = [
-                {"action": "click_image_if", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_image_if", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 5},
                 {"action": "click_coords", "x": 325, "y": 550}, 
                 {"action": "wait", "timeout": 2},
                 {"action": "loop_cases",
@@ -434,7 +436,9 @@ class AutoClickerInstance:
                         }
                     ]
                 },
-                {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/x1.png",  "timeout": 20},
+                {"action": "click_image_if", "target": "images/space1.png",  "timeout": 20},
+
             ]
         else:
             # Kịch bản hiện tại: Chỉ giao item1, item2
