@@ -419,7 +419,8 @@ class AutoClickerInstance:
         if delivery_mode == "all":
             # Kịch bản giao hết (Người dùng sẽ tự làm sau)
             resident_script = [
-                {"action": "click_image", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_image_if", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_coords", "x": 325, "y": 550}, 
                 {"action": "wait", "timeout": 2},
                 {"action": "loop_cases",
                     "max_loops": 8,
@@ -438,7 +439,8 @@ class AutoClickerInstance:
         else:
             # Kịch bản hiện tại: Chỉ giao item1, item2
             resident_script = [
-                {"action": "click_image", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_image_if", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
+                {"action": "click_coords", "x": 325, "y": 550}, 
                 {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
                 {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
                 {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
@@ -1263,9 +1265,7 @@ class MultiPremiumApp(ctk.CTk):
 
         self.enabled_tasks["delivery_mode"] = self.delivery_mode_var
 
-        # Credit Footer
-        ctk.CTkLabel(self.sidebar, text="Nguồn: RyoUTE - 0393203161", font=ctk.CTkFont(size=11), text_color="#666").pack(side="bottom", pady=20)
-
+    
         # 2. Main Area
         self.main_content = ctk.CTkFrame(self, fg_color="transparent")
         self.main_content.pack(side="right", fill="both", expand=True, padx=20, pady=(5, 20))
@@ -1758,7 +1758,7 @@ class MultiPremiumApp(ctk.CTk):
 class LoginApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("KÍCH HOẠT Mega-TGHVCT-Tool")
+        self.title("KÍCH HOẠT Tool Mr Thanh - Thế Giới Hoa Viên")
         self.geometry("500x550")
         self.resizable(False, False)
         self.configure(fg_color=BG_COLOR)
@@ -1768,7 +1768,7 @@ class LoginApp(ctk.CTk):
 
     def setup_ui(self):
         # Logo & Title
-        ctk.CTkLabel(self, text="Mega-TGHVCT-Tool(LD)", font=ctk.CTkFont(size=24, weight="bold"), text_color=ACCENT_GREEN).pack(pady=(40, 10))
+        ctk.CTkLabel(self, text="Tool Mr Thanh - Thế Giới Hoa Viên", font=ctk.CTkFont(size=24, weight="bold"), text_color=ACCENT_GREEN).pack(pady=(40, 10))
         ctk.CTkLabel(self, text="HỆ THỐNG QUẢN LÝ BẢN QUYỀN", font=ctk.CTkFont(size=12)).pack(pady=(0, 30))
 
         # HWID Box
@@ -1794,9 +1794,6 @@ class LoginApp(ctk.CTk):
         
         self.status_label = ctk.CTkLabel(self, text="", text_color=ACCENT_RED)
         self.status_label.pack(pady=10)
-
-        # Footer Credit (Nguồn)
-        ctk.CTkLabel(self, text="Nguồn: RyoUTE - 0393203161", font=ctk.CTkFont(size=12, weight="bold"), text_color="#777").pack(pady=(30, 20))
 
     def activate(self):
         key = self.key_input.get().strip()
@@ -1837,4 +1834,4 @@ if __name__ == "__main__":
         app.mainloop()
 
 
-# pyinstaller --noconfirm --onefile --windowed --name "MegaTGHVCTTool" --add-data "images;images" --add-data "logo.png;." --add-data "start.png;." --add-data "stop.png;." gui_tool.py
+# pyinstaller --noconfirm --onefile --windowed --name "Tool Mr Thanh - Thế Giới Hoa Viên" --add-data "images;images" --add-data "logo.png;." --add-data "start.png;." --add-data "stop.png;." gui_tool.py
