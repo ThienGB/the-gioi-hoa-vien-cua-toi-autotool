@@ -932,7 +932,7 @@ class AutoClickerInstance:
             return False
 
         target_names = [os.path.basename(t[0]) for t in prepared_targets]
-        self.log(f"Đang đợi click và lưu tọa độ: {', '.join(target_names)} (Timeout: {timeout}s)")
+        self.log(f"Đang đợi click và lưu tọa độ (Vùng giữa): {', '.join(target_names)} (Timeout: {timeout}s)")
 
         start = time.time()
         last_log_time = start
@@ -940,11 +940,23 @@ class AutoClickerInstance:
         while time.time() - start < timeout and self.running:
             screen = self.get_screenshot()
             if screen is not None:
+                h, w = screen.shape[:2]
+                
+                # CHỈ QUÉT VÙNG GIỮA (Loại bỏ 20% mỗi bên trái/phải, 15% trên/dưới)
+                # Giúp tránh nhận diện nhầm các icon ở rìa màn hình (sidebar/header/footer)
+                x1, x2 = int(w * 0.20), int(w * 0.80)
+                y1, y2 = int(h * 0.15), int(h * 0.85)
+                roi = screen[y1:y2, x1:x2]
+                
                 best_match = 0
                 best_img_name = ""
                 
                 for t_path, t_img in prepared_targets:
-                    res = cv2.matchTemplate(screen, t_img, cv2.TM_CCOEFF_NORMED)
+                    # Đảm bảo ảnh mẫu nhỏ hơn vùng quét
+                    th, tw = t_img.shape[:2]
+                    if th > (y2-y1) or tw > (x2-x1): continue
+
+                    res = cv2.matchTemplate(roi, t_img, cv2.TM_CCOEFF_NORMED)
                     _, max_val, _, max_loc = cv2.minMaxLoc(res)
                     del res
                     
@@ -953,8 +965,9 @@ class AutoClickerInstance:
                         best_img_name = os.path.basename(t_path)
                         
                     if max_val >= confidence:
-                        th, tw = t_img.shape[:2]
-                        cx, cy = max_loc[0] + tw//2, max_loc[1] + th//2
+                        # Tọa độ thực tế = Tọa độ trong ROI + Tọa độ gốc của ROI
+                        cx, cy = max_loc[0] + x1 + tw//2, max_loc[1] + y1 + th//2
+                        
                         # PHẦN QUAN TRỌNG: Lưu tọa độ để dùng cho sau này (tưới cây/thu hoạch)
                         self.last_coords = (cx, cy)
                         self.call_adb(["shell", "input", "tap", str(cx), str(cy)])
@@ -966,12 +979,12 @@ class AutoClickerInstance:
                 cur_time = time.time()
                 if cur_time - last_log_time >= 2.0:
                     if best_match > 0.4:
-                        self.log(f"   [Quét lưu tọa độ] Chưa khớp. Tốt nhất hiện tại: {best_img_name} ({best_match:.2f}/{confidence})")
+                        self.log(f"   [Quét lưu tọa độ] Chưa khớp ở vùng giữa. Tốt nhất: {best_img_name} ({best_match:.2f}/{confidence})")
                     last_log_time = cur_time
                     
             time.sleep(1)
             
-        self.log(f"-> THẤT BẠI: Hết {timeout}s không khớp ảnh nào để lưu tọa độ.")
+        self.log(f"-> THẤT BẠI: Hết {timeout}s không khớp ảnh nào trong vùng giữa để lưu tọa độ.")
         return False
 
     def add_task(self, name, script, interval=60, max_runs=-1, initial_delay=0):
