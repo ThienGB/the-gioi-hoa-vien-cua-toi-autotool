@@ -55,7 +55,7 @@ def get_cached_image(path, grayscale=False):
     return IMAGE_CACHE.get(cache_key)
 
 # --- Security & Licensing ---
-SECRET_KEY = "RyoUTE_MegaUpLvCF_2026"
+SECRET_KEY = "RyoUTE_MegaTGHVCT_Tool_2026"
 LICENSE_FILE = "license.bin"
 
 def get_hwid():

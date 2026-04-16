@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pyperclip # Thư viện để copy nhanh vào clipboard
 
 # PHẢI TRÙNG VỚI SECRET_KEY TRONG gui_tool.py
-SECRET_KEY = "RyoUTE_MegaUpLvCF_2026"
+SECRET_KEY = "RyoUTE_MegaTGHVCT_Tool_2026"
 
 # --- Theme Configuration ---
 ctk.set_appearance_mode("Dark")
