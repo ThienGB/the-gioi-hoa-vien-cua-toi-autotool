@@ -283,6 +283,8 @@ class AutoClickerInstance:
             res = self.click_coords_logic(step)
         elif action == "type_text":
             res = self.type_text_logic(step)
+        elif action == "swipe_plant":
+            res = self.swipe_plant_logic(step)
         elif action == "wait":
             wait_time = step.get("duration") or step.get("timeout") or 1
             time.sleep(wait_time)
@@ -350,11 +352,12 @@ class AutoClickerInstance:
         self.add_task(
             name="Thuê Ngọc Trai", 
             script=[
-                {"action": "click_image", "target": "images/ngoc_trai.png", "timeout": 10},
+                {"action": "click_image", "target1": "images/ngoc_trai.png", "target2": "images/ngoc_trai1.png", "timeout": 10},
                 {"action": "click_image_if", "target": "images/thu_hoach.png", "timeout": 3},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_any", "timeout": 3},
                 {"action": "loop_cases",
+                    "max_loops": 10,
                     "cases": [
                         {
                             "trigger1": "images/plus.png", "trigger2": "images/plus1.png",
@@ -372,7 +375,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target1": "images/space1.png", "target2": "images/space.png", "timeout": 5},
 
             ], 
-            interval=60*16, # 1 phút 1 giây
+            interval=60*60*2 + 60*5, # 2 tiếng 5 phút
             max_runs=-1  # -1 là lặp vô tận
         )
 
@@ -388,9 +391,8 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/thoat_trong_cay.png",  "timeout": 20},
                 {"action": "wait", "timeout": 2},
                 {"action": "click_image_if", "target": "images/thoat_hoi1.png",  "timeout": 20},
-
             ], 
-            interval=60*21, 
+            interval=60*60*2, 
             max_runs=-1
         )
         # Task 3: Mua ở Shop
@@ -410,7 +412,7 @@ class AutoClickerInstance:
 
                 {"action": "click_image_if", "target": "images/thoat_tiem.png",  "timeout": 20},
             ], 
-            interval=60*31, 
+            interval=60*60*2 + 60*35, 
             max_runs=-1
         )
         # Task 4: Giao hàng cư dân
@@ -433,65 +435,84 @@ class AutoClickerInstance:
                                 {"action": "click_image", "target": "images/gui.png"},
                                 {"action": "wait", "timeout": 2}
                             ]
+                        },
+                        {
+                            "trigger": "images/nhan_mien_phi.png",
+                            "script": [
+                                {"action": "click_image", "target": "images/nhan_mien_phi.png"},
+                                {"action": "wait", "timeout": 2}
+                            ]
                         }
                     ]
                 },
                 {"action": "click_image_if", "target": "images/x1.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/space1.png",  "timeout": 20},
-
             ]
         else:
             # Kịch bản hiện tại: Chỉ giao item1, item2
             resident_script = [
                 {"action": "click_image_if", "target1": "images/nhiem_vu1.jpg","target2": "images/nhiem_vu.jpg","target3": "images/nhiem_vu.png",  "timeout": 20},
                 {"action": "click_coords", "x": 325, "y": 550}, 
-                {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
-                {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
-                {"action": "wait", "timeout": 2},
                 {
                     "action": "if_exists",
-                    "target": "images/muon_xiu_roi_nhan.jpg",
+                    "target": "images/item1.png",
                     "timeout": 3,
                     "script": [
-                        {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
+                        {"action": "click_image", "target": "images/item1.png",  "timeout": 20},
+                        {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
+                        {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
                         {"action": "wait", "timeout": 2},
-                        {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 20},
-                        {"action": "wait", "timeout": 2},
-                        {"action": "click_image", "target": "images/x1.png", "timeout": 20},
+                        {
+                            "action": "if_exists",
+                            "target": "images/muon_xiu_roi_nhan.jpg",
+                            "timeout": 3,
+                            "script": [
+                                {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
+                                {"action": "wait", "timeout": 2},
+                                {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 20},
+                                {"action": "wait", "timeout": 2},
+                                {"action": "click_image", "target": "images/x1.png", "timeout": 20},
+                            ]
+                        },
+                        {
+                            "action": "if_exists",
+                            "target": "images/x_cu_dan.png",
+                            "timeout": 3,
+                            "script": [
+                                {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
+                            ]
+                        },
                     ]
                 },
                 {
                     "action": "if_exists",
-                    "target": "images/x_cu_dan.png",
+                    "target": "images/item2.png",
                     "timeout": 3,
                     "script": [
-                        {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
-                    ]
-                },
-                {"action": "click_image", "target": "images/item2.png",  "timeout": 20},
-                {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
-                {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
-                {"action": "wait", "timeout": 2},
-                {"action": "click_image_if", "target": "images/x1.png",  "timeout": 3},
-                {
-                    "action": "if_exists",
-                    "target": "images/muon_xiu_roi_nhan.jpg",
-                    "timeout": 3,
-                    "script": [
-                        {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
-                        {"action": "wait", "timeout": 2},
-                        {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 20},
-                        {"action": "wait", "timeout": 2},
-                        {"action": "click_image", "target": "images/x1.png", "timeout": 20},
-                    ]
-                },
-                {
-                    "action": "if_exists",
-                    "target": "images/x_cu_dan.png",
-                    "timeout": 3,
-                    "script": [
-                        {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
+                    {"action": "click_image", "target": "images/item2.png",  "timeout": 20},
+                    {"action": "click_image_if", "target": "images/nhan_nhiem_vu.jpg",  "timeout": 3},
+                    {"action": "click_image_if", "target": "images/gui.png",  "timeout": 7},
+                    {"action": "wait", "timeout": 2},
+                    {"action": "click_image_if", "target": "images/x1.png",  "timeout": 3},
+                    {
+                        "action": "if_exists",
+                        "target": "images/muon_xiu_roi_nhan.jpg",
+                        "timeout": 3,
+                        "script": [
+                            {"action": "click_image", "target": "images/muon_xiu_roi_nhan.jpg", "timeout": 20},
+                            {"action": "wait", "timeout": 2},
+                            {"action": "click_image", "target": "images/xac_nhan1.png", "timeout": 20},
+                            {"action": "wait", "timeout": 2},
+                            {"action": "click_image", "target": "images/x1.png", "timeout": 20},
+                        ]
+                    },
+                    {
+                        "action": "if_exists",
+                        "target": "images/x_cu_dan.png",
+                        "timeout": 3,
+                        "script": [
+                            {"action": "click_image", "target": "images/x_cu_dan.png", "timeout": 20},
+                        ]
+                    },
                     ]
                 },
                 {"action": "click_image", "target": "images/x1.png",  "timeout": 20},
@@ -500,7 +521,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng cư dân", 
             script=resident_script, 
-            interval=66, 
+            interval=80, 
             max_runs=100
         )
 
@@ -521,10 +542,10 @@ class AutoClickerInstance:
                             ]
                         },
                         {
-                            "trigger": "images/vang.png",
+                            "trigger1": "images/vang.png","trigger2": "images/vang1.png", "trigger3": "images/vang2.png","trigger4": "images/vang3.png", "trigger5": "images/vang4.png", "trigger6": "images/vang_con_meo.jpg",
                             "confidence": 0.8,
                             "script": [
-                                {"action": "click_image", "target": "images/vang.png", "confidence": 0.8},
+                                {"action": "click_image_if", "target1": "images/vang.png","target2": "images/vang1.png", "target3": "images/vang2.png","target4": "images/vang3.png", "target5": "images/vang4.png", "target6": "images/vang_con_meo.jpg", "confidence": 0.8},
                                 {"action": "wait", "timeout": 2},
                                 {
                                     "action": "if_exists",
@@ -552,6 +573,7 @@ class AutoClickerInstance:
                                         {"action": "click_image", "target": "images/bo_qua.png"},
                                         {"action": "wait", "timeout": 2},
                                         {"action": "click_any", "timeout": 3},
+                                        {"action": "click_image_if", "target": "images/ket_thuc.jpg","timeout": 5},
                                     ]
                                 },
                                 {
@@ -562,6 +584,36 @@ class AutoClickerInstance:
                                         {"action": "click_image", "target": "images/space1.png", "confidence": 0.7},
                                         {"action": "wait", "timeout": 2},
                                         
+                                    ]
+                                },
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/giai_quyet_van_de.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image", "target": "images/giai_quyet_van_de.png", "confidence": 0.8},
+                                        {"action": "wait", "timeout": 2},
+                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
+                                    ]
+                                },
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/so_no.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image", "target": "images/so_no.png", "confidence": 0.8},
+                                        {"action": "wait", "timeout": 2},
+                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
+                                    ]
+                                },
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/meo_ngoan.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image", "target": "images/meo_ngoan.png", "confidence": 0.8},
+                                        {"action": "wait", "timeout": 2},
+                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
                                     ]
                                 }
                             ]
@@ -584,12 +636,22 @@ class AutoClickerInstance:
                                         {"action": "click_image", "target": "images/xx.png"},
                                     ]
                                 },
+                                {
+                                    "action": "if_exists",
+                                    "target": "images/nhan_nuoc.png",
+                                    "timeout": 3,
+                                    "script": [
+                                        {"action": "click_image_if", "target": "images/nhan_nuoc.png", "timeout": 5},
+                                        {"action": "click_any", "timeout": 3},
+                                        {"action": "click_image", "target": "images/x4.png"},
+                                    ]
+                                },
                             ]
                         }
                     ]
                 }
             ], 
-            interval=61, 
+            interval=30, 
             max_runs=-1
         )
         # Task 6: Trưng bày hoa
@@ -620,7 +682,7 @@ class AutoClickerInstance:
                 {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
                 {"action": "click_image", "target": "images/space1.png",  "timeout": 20},
             ], 
-            interval=60*25, 
+            interval=60*55, 
             max_runs=-1
         )
 
@@ -693,9 +755,15 @@ class AutoClickerInstance:
                     except: continue
                 
                 if case_matched:
+                    step_failed = False
                     for s_step in sub_script:
                         if not self.running: break
-                        self.execute_step(s_step)
+                        if not self.execute_step(s_step):
+                            step_failed = True
+                            break
+                    if step_failed:
+                        self.log("-> DỪNG VÒNG LẶP: Một bước trong kịch bản con bị lỗi.")
+                        return True
                     loops_matched += 1  # Tăng bộ đếm mỗi lần khớp
                     break # Thoát vòng lặp cases để chụp ảnh màn hình mới
             
@@ -850,6 +918,33 @@ class AutoClickerInstance:
             self.log(f"CLICK TỌA ĐỘ: ({x}, {y})")
             return True
         return False
+
+    def swipe_plant_logic(self, step):
+        self.log("BẮT ĐẦU TRỒNG TAY (Lia qua các ô)...")
+        sx = step.get("x", 80)
+        sy = step.get("y", 590)
+        
+        screen = self.get_screenshot()
+        if screen is None:
+            w, h = 1280, 720
+        else:
+            h, w = screen.shape[:2]
+            del screen
+            
+        y_start = int(h * 0.15)
+        y_end = int(h * 0.75)
+        y_step = int(h * 0.15)
+        
+        x_points = [int(w * 0.2), int(w * 0.5), int(w * 0.8)]
+        
+        for y in range(y_start, y_end, y_step):
+            for x in x_points:
+                if not self.running: break
+                self.call_adb(["shell", "input", "swipe", str(sx), str(sy), str(x), str(y), "600"])
+                time.sleep(0.1)
+                
+        self.log("HOÀN TẤT LIA TRỒNG TAY.")
+        return True
 
     def click_image_logic(self, step):
         targets = []
@@ -1024,24 +1119,42 @@ class AutoClickerInstance:
         
         # Sử dụng f["name"] làm search text
         search_txt = f["name"][:20] 
+        trong_tay = f.get("trong_tay", False)
         
         # --- GIAI ĐOẠN 1: TRỒNG VÀ TƯỚI NƯỚC (Chạy nhanh, không đợi) ---
-        script_plant = [
-            {"action": "click_and_save_coords", "target": "images/dat_trong.png", "timeout": 20},
-            {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
-            {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
-            {"action": "wait", "timeout": 3},
-            {"action": "click_coords", "x": 200, "y": 520}, # Click ô tìm kiếm
-            {"action": "wait", "timeout": 3},
-            {"action": "type_text", "text": search_txt},
-            {"action": "wait", "timeout": 3},
-            {"action": "click_coords", "x": 80, "y": 590},
-            {"action": "click_coords", "x": 80, "y": 590}, # Click chọn hoa đầu tiên
-            {"action": "wait", "timeout": 5},
-            {"action": "click_saved_coords"}, # Nhấn vào đất để hiện menu/tưới
-            {"action": "click_saved_coords"},
-            {"action": "click_image", "target": "images/tuoi_nhanh.png", "timeout": 20}
-        ]
+        if trong_tay:
+            script_plant = [
+                {"action": "click_and_save_coords", "target": "images/dat_trong.png", "timeout": 20},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 200, "y": 520}, # Click ô tìm kiếm
+                {"action": "wait", "timeout": 3},
+                {"action": "type_text", "text": search_txt},
+                {"action": "wait", "timeout": 3},
+                {"action": "swipe_plant", "x": 80, "y": 590},
+                {"action": "wait", "timeout": 5},
+                {"action": "click_coords", "x": 500, "y": 100}, # Thoát menu nếu cần
+                {"action": "wait", "timeout": 2},
+                {"action": "click_saved_coords"}, # Nhấn vào đất để hiện menu/tưới
+                {"action": "click_saved_coords"},
+                {"action": "click_image", "target": "images/tuoi_nhanh.png", "timeout": 20}
+            ]
+        else:
+            script_plant = [
+                {"action": "click_and_save_coords", "target": "images/dat_trong.png", "timeout": 20},
+                {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
+                {"action": "click_image_if", "target": "images/trong_nhanh.png", "timeout": 5},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 200, "y": 520}, # Click ô tìm kiếm
+                {"action": "wait", "timeout": 3},
+                {"action": "type_text", "text": search_txt},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_coords", "x": 80, "y": 590},
+                {"action": "click_coords", "x": 80, "y": 590}, # Click chọn hoa đầu tiên
+                {"action": "wait", "timeout": 5},
+                {"action": "click_saved_coords"}, # Nhấn vào đất để hiện menu/tưới
+                {"action": "click_saved_coords"},
+                {"action": "click_image", "target": "images/tuoi_nhanh.png", "timeout": 20}
+            ]
         
         # Thêm task trồng, chạy xong task này sẽ chuyển sang phase thu hoạch
         self.add_task("Flower_Plant", script_plant, interval=0, max_runs=1)
@@ -1055,17 +1168,30 @@ class AutoClickerInstance:
         f = next_item["flower_info"]
         inter = next_item["harvest_interval"]
         growth = f.get("growth_time", 30)
+        cham_nhanh = f.get("cham_nhanh", False)
         
-        # Kịch bản cho 1 lần thu hoạch
-        script_harvest = [
-            {"action": "wait", "timeout": 5},
-            {"action": "click_saved_coords"},
-            {"action": "click_saved_coords"},
-            {"action": "click_image_if", "target": "images/thu_hoach_nhanh.png", "timeout": 5}
-        ]
-        
-        # Lần đầu (sau khi tưới xong) thu hoạch ngay lập tức, các lần sau chờ thời gian giữa các đợt (inter)
-        delay = 0 if is_first else inter
+        if cham_nhanh and not is_first:
+            script_harvest = [
+                {"action": "wait", "timeout": 2},
+                {"action": "click_saved_coords"},
+                {"action": "click_saved_coords"},
+                {"action": "click_image_if", "target": "images/tang_toc_nhanh.jpg", "timeout": 5},
+                {"action": "wait", "timeout": 3},
+                {"action": "click_saved_coords"},
+                {"action": "click_saved_coords"},
+                {"action": "click_image_if", "target": "images/thu_hoach_nhanh.png", "timeout": 5}
+            ]
+            delay = 0
+        else:
+            # Kịch bản cho 1 lần thu hoạch
+            script_harvest = [
+                {"action": "wait", "timeout": 5},
+                {"action": "click_saved_coords"},
+                {"action": "click_saved_coords"},
+                {"action": "click_image_if", "target": "images/thu_hoach_nhanh.png", "timeout": 5}
+            ]
+            # Lần đầu (sau khi tưới xong) thu hoạch ngay lập tức, các lần sau chờ thời gian giữa các đợt (inter)
+            delay = 0 if is_first else inter
         
         # Thêm task thu hoạch chạy 1 lần sau thời gian delay (giúp xen kẽ task khác)
         self.add_task("Flower_Harvest", script_harvest, interval=0, max_runs=1, initial_delay=delay)
@@ -1373,11 +1499,24 @@ class MultiPremiumApp(ctk.CTk):
         self.ent_harvest_interval.pack(pady=(5, 0))
         self.ent_harvest_interval.insert(0, "60")
         
-        # Nút THÊM (Cột 4)
+        # Cột 4: Switches (Chăm nhanh, Trồng tay)
         col4 = ctk.CTkFrame(form_frame, fg_color="transparent")
-        col4.pack(side="right", padx=(10, 0))
-        ctk.CTkLabel(col4, text="", font=ctk.CTkFont(size=11)).pack(anchor="w")
-        self.btn_add_manual = ctk.CTkButton(col4, text=" + THÊM ", width=100, height=35, fg_color=ACCENT_GREEN, text_color="#000", 
+        col4.pack(side="left", padx=10)
+        
+        self.var_cham_nhanh = ctk.BooleanVar(value=False)
+        self.var_trong_tay = ctk.BooleanVar(value=False)
+        
+        cb_cham_nhanh = ctk.CTkCheckBox(col4, text="Chăm nhanh", variable=self.var_cham_nhanh, font=ctk.CTkFont(size=11), checkbox_width=18, checkbox_height=18)
+        cb_cham_nhanh.pack(anchor="w", pady=(5, 2))
+        
+        cb_trong_tay = ctk.CTkCheckBox(col4, text="Trồng tay", variable=self.var_trong_tay, font=ctk.CTkFont(size=11), checkbox_width=18, checkbox_height=18)
+        cb_trong_tay.pack(anchor="w")
+
+        # Nút THÊM (Cột 5)
+        col5 = ctk.CTkFrame(form_frame, fg_color="transparent")
+        col5.pack(side="right", padx=(10, 0))
+        ctk.CTkLabel(col5, text="", font=ctk.CTkFont(size=11)).pack(anchor="w")
+        self.btn_add_manual = ctk.CTkButton(col5, text=" + THÊM ", width=100, height=35, fg_color=ACCENT_GREEN, text_color="#000", 
                                             font=ctk.CTkFont(weight="bold"), command=self.add_manual_flower)
         self.btn_add_manual.pack(pady=(5, 0))
 
@@ -1416,6 +1555,8 @@ class MultiPremiumApp(ctk.CTk):
         self.ent_harvest_count.insert(0, str(item.get("count", 1)))
         self.ent_harvest_interval.delete(0, 'end')
         self.ent_harvest_interval.insert(0, str(item.get("interval", 60)))
+        self.var_cham_nhanh.set(item.get("cham_nhanh", False))
+        self.var_trong_tay.set(item.get("trong_tay", False))
 
     def get_history_data(self):
         try:
@@ -1425,11 +1566,11 @@ class MultiPremiumApp(ctk.CTk):
         except: pass
         return []
 
-    def save_to_history(self, name, count, interval):
+    def save_to_history(self, name, count, interval, cham_nhanh=False, trong_tay=False):
         history = self.get_history_data()
         # Loại bỏ nếu đã tồn tại để đẩy lên đầu
         history = [h for h in history if h["name"] != name]
-        history.insert(0, {"name": name, "count": count, "interval": interval})
+        history.insert(0, {"name": name, "count": count, "interval": interval, "cham_nhanh": cham_nhanh, "trong_tay": trong_tay})
         try:
             with open("flower_history.json", "w", encoding="utf-8") as f:
                 json.dump(history[:20], f, ensure_ascii=False, indent=4)
@@ -1439,6 +1580,8 @@ class MultiPremiumApp(ctk.CTk):
         name = self.ent_flower_name.get().strip()
         count_str = self.ent_harvest_count.get().strip()
         interval_str = self.ent_harvest_interval.get().strip()
+        cham_nhanh = self.var_cham_nhanh.get()
+        trong_tay = self.var_trong_tay.get()
         
         if not name: return
         
@@ -1448,11 +1591,11 @@ class MultiPremiumApp(ctk.CTk):
         except: return
         
         # Lưu vào lịch sử và cập nhật UI lịch sử
-        self.save_to_history(name, count, interval)
+        self.save_to_history(name, count, interval, cham_nhanh, trong_tay)
         self.update_history_ui()
 
         # Tạo flower object giả lập để dùng cho logic add_flower_task
-        flower_obj = {"name": name}
+        flower_obj = {"name": name, "cham_nhanh": cham_nhanh, "trong_tay": trong_tay}
         
         if len(self.flower_queue) >= 50:
             self.add_log("CẢNH BÁO: Hàng đợi trồng hoa đã đầy (5/5)!")
