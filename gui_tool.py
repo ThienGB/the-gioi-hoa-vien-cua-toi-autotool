@@ -372,7 +372,9 @@ class AutoClickerInstance:
                         }
                     ]
                 },
-                {"action": "click_image_if", "target1": "images/space1.png", "target2": "images/space.png", "timeout": 5},
+               {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
+               {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
+               {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
 
             ], 
             interval=60*60*2 + 60*5, # 2 tiếng 5 phút
