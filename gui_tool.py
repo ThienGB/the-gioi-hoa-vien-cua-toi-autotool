@@ -354,7 +354,7 @@ class AutoClickerInstance:
             script=[
                 {"action": "click_image", "target1": "images/ngoc_trai.png", "target2": "images/ngoc_trai1.png", "timeout": 10},
                 {"action": "click_image_if", "target": "images/thu_hoach.png", "timeout": 3},
-                {"action": "wait", "timeout": 2},
+                
                 {"action": "click_any", "timeout": 3},
                 {"action": "loop_cases",
                     "max_loops": 10,
@@ -363,8 +363,8 @@ class AutoClickerInstance:
                             "trigger1": "images/plus.png", "trigger2": "images/plus1.png",
                             "script": [
                                 {"action": "click_image", "target1": "images/plus.png" , "target2": "images/plus1.png"},
-                                {"action": "click_image_if", "target": "images/the_gioi.png", "timeout": 5},
-                                {"action": "click_image", "target": "images/thue.png", "timeout": 10},
+                                {"action": "click_coords", "x": 224, "y": 404, "timeout": 2},
+                                {"action": "click_coords", "x": 393, "y": 469, "timeout": 2},
                                 {"action": "wait", "timeout": 2},
                                 {"action": "click_image_if", "target": "images/xac_nhan1.png", "timeout": 5},
                                 {"action": "click_image_if", "target": "images/space.png", "timeout": 5},
@@ -545,7 +545,9 @@ class AutoClickerInstance:
                             "trigger1": "images/vang.png","trigger2": "images/vang1.png", "trigger3": "images/vang2.png","trigger4": "images/vang3.png", "trigger5": "images/vang4.png", "trigger6": "images/vang_con_meo.jpg",
                             "confidence": 0.8,
                             "script": [
-                                {"action": "click_image_if", "target1": "images/vang.png","target2": "images/vang1.png", "target3": "images/vang2.png","target4": "images/vang3.png", "target5": "images/vang4.png", "target6": "images/vang_con_meo.jpg", "confidence": 0.8},
+                               {"action": "click_coords", "x": 344, "y": 428, "timeout": 2}, 
+                               {"action": "click_coords", "x": 315, "y": 345, "timeout": 2}, 
+                               {"action": "click_coords", "x": 214, "y": 422, "timeout": 2}, 
                                 {"action": "wait", "timeout": 2},
                                 {
                                     "action": "if_exists",
@@ -555,67 +557,67 @@ class AutoClickerInstance:
                                         {"action": "click_image", "target": "images/den_lam.png"},
                                         {"action": "wait", "timeout": 2},
                                         {"action": "click_image", "target": "images/lam.png"},
-                                        {"action": "wait", "timeout": 5},
+                                        {"action": "wait", "timeout": 3},
                                         {"action": "click_image", "target": "images/xac_nhan.png"},
-                                        {"action": "click_any", "timeout": 3},
-                                        {"action": "wait", "timeout": 5},
+                                        {"action": "click_any", "timeout": 2},
+                                        {"action": "wait", "timeout": 3},
                                         {"action": "click_image", "target": "images/giao.png"},
-                                        {"action": "click_any", "timeout": 3}
+                                        {"action": "click_any", "timeout": 2}
                                     ]
                                 },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/tiep_tuc.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/tiep_tuc.png"},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_image", "target": "images/bo_qua.png"},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_any", "timeout": 3},
-                                        {"action": "click_image_if", "target": "images/ket_thuc.jpg","timeout": 5},
-                                    ]
-                                },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/space1.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/space1.png", "confidence": 0.7},
-                                        {"action": "wait", "timeout": 2},
+                            #     {
+                            #         "action": "if_exists",
+                            #         "target": "images/tiep_tuc.png",
+                            #         "timeout": 3,
+                            #         "script": [
+                            #             {"action": "click_image", "target": "images/tiep_tuc.png"},
+                            #             {"action": "wait", "timeout": 2},
+                            #             {"action": "click_image", "target": "images/bo_qua.png"},
+                            #             {"action": "wait", "timeout": 2},
+                            #             {"action": "click_any", "timeout": 3},
+                            #             {"action": "click_image_if", "target": "images/ket_thuc.jpg","timeout": 5},
+                            #         ]
+                            #     },
+                            #     {
+                            #         "action": "if_exists",
+                            #         "target": "images/space1.png",
+                            #         "timeout": 3,
+                            #         "script": [
+                            #             {"action": "click_image", "target": "images/space1.png", "confidence": 0.7},
+                            #             {"action": "wait", "timeout": 2},
                                         
-                                    ]
-                                },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/giai_quyet_van_de.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/giai_quyet_van_de.png", "confidence": 0.8},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
-                                    ]
-                                },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/so_no.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/so_no.png", "confidence": 0.8},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
-                                    ]
-                                },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/meo_ngoan.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/meo_ngoan.png", "confidence": 0.8},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
-                                    ]
-                                }
+                            #         ]
+                            #     },
+                            #     {
+                            #         "action": "if_exists",
+                            #         "target": "images/giai_quyet_van_de.png",
+                            #         "timeout": 3,
+                            #         "script": [
+                            #             {"action": "click_image", "target": "images/giai_quyet_van_de.png", "confidence": 0.8},
+                            #             {"action": "wait", "timeout": 2},
+                            #             {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
+                            #         ]
+                            #     },
+                            #     {
+                            #         "action": "if_exists",
+                            #         "target": "images/so_no.png",
+                            #         "timeout": 3,
+                            #         "script": [
+                            #             {"action": "click_image", "target": "images/so_no.png", "confidence": 0.8},
+                            #             {"action": "wait", "timeout": 2},
+                            #             {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
+                            #         ]
+                            #     },
+                            #     {
+                            #         "action": "if_exists",
+                            #         "target": "images/meo_ngoan.png",
+                            #         "timeout": 3,
+                            #         "script": [
+                            #             {"action": "click_image", "target": "images/meo_ngoan.png", "confidence": 0.8},
+                            #             {"action": "wait", "timeout": 2},
+                            #             {"action": "click_image", "target": "images/back.png", "confidence": 0.8},
+                            #         ]
+                            #     }
                             ]
                         },
                         {
@@ -625,33 +627,33 @@ class AutoClickerInstance:
                                 {"action": "click_image", "target1": "images/xanh.png", "target2": "images/xanh2.png", "confidence": 0.8},
                                 {"action": "click_image", "target": "images/giao.png"},
                                 {"action": "click_any", "timeout": 3},
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/next.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image", "target": "images/xanh.png"},
-                                        {"action": "wait", "timeout": 2},
-                                        {"action": "click_image", "target": "images/nhan.png"},
-                                        {"action": "click_image", "target": "images/xx.png"},
-                                    ]
-                                },
-                                {
-                                    "action": "if_exists",
-                                    "target": "images/nhan_nuoc.png",
-                                    "timeout": 3,
-                                    "script": [
-                                        {"action": "click_image_if", "target": "images/nhan_nuoc.png", "timeout": 5},
-                                        {"action": "click_any", "timeout": 3},
-                                        {"action": "click_image", "target": "images/x4.png"},
-                                    ]
-                                },
+                                # {
+                                #     "action": "if_exists",
+                                #     "target": "images/next.png",
+                                #     "timeout": 3,
+                                #     "script": [
+                                #         {"action": "click_image", "target": "images/xanh.png"},
+                                #         {"action": "wait", "timeout": 2},
+                                #         {"action": "click_image", "target": "images/nhan.png"},
+                                #         {"action": "click_image", "target": "images/xx.png"},
+                                #     ]
+                                # },
+                                # {
+                                #     "action": "if_exists",
+                                #     "target": "images/nhan_nuoc.png",
+                                #     "timeout": 3,
+                                #     "script": [
+                                #         {"action": "click_image_if", "target": "images/nhan_nuoc.png", "timeout": 5},
+                                #         {"action": "click_any", "timeout": 3},
+                                #         {"action": "click_image", "target": "images/x4.png"},
+                                #     ]
+                                # },
                             ]
                         }
                     ]
                 }
             ], 
-            interval=30, 
+            interval=60, 
             max_runs=-1
         )
         # Task 6: Trưng bày hoa
@@ -1176,6 +1178,7 @@ class AutoClickerInstance:
                 {"action": "click_saved_coords"},
                 {"action": "click_saved_coords"},
                 {"action": "click_image_if", "target": "images/tang_toc_nhanh.jpg", "timeout": 5},
+                {"action": "click_image_if", "target": "images/xacnhan1.png", "timeout": 5},
                 {"action": "wait", "timeout": 3},
                 {"action": "click_saved_coords"},
                 {"action": "click_saved_coords"},
