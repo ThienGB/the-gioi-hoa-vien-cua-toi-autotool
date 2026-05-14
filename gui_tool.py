@@ -352,7 +352,7 @@ class AutoClickerInstance:
         self.add_task(
             name="Thuê Ngọc Trai", 
             script=[
-                {"action": "click_image", "target1": "images/ngoc_trai.png", "target2": "images/ngoc_trai1.png", "timeout": 10},
+                {"action": "click_coords", "x": 528, "y": 675, "timeout": 2},
                 {"action": "click_image_if", "target": "images/thu_hoach.png", "timeout": 3},
                 
                 {"action": "click_any", "timeout": 3},
@@ -666,10 +666,10 @@ class AutoClickerInstance:
         self.add_task(
             name="Trưng bày hoa", 
             script=[
-                {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
-                {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
-                {"action": "click_image_if", "target": "images/lay_tien.png",  "timeout": 7},
-                {"action": "click_image", "target": "images/trung_bay_hoa.png", "target1": "images/trung_bay_hoa1.jpg",  "timeout": 20},
+                {"action": "click_coords", "x": 174, "y": 457,  "timeout": 3},
+                {"action": "click_coords", "x": 237, "y": 417,  "timeout": 3},
+                {"action": "click_coords", "x": 287, "y": 401,  "timeout": 3},
+                {"action": "click_coords", "x": 287, "y": 401,  "timeout": 3}, 
                 {"action": "wait", "timeout": 3},
                 {"action": "click_coords", "x": 100, "y": 740}, 
                 {"action": "click_image_if", "target": "images/bay_ban.png",  "timeout": 10},
