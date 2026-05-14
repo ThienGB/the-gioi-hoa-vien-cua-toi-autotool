@@ -529,6 +529,10 @@ class AutoClickerInstance:
         self.add_task(
             name="Giao hàng tại sảnh", 
             script=[
+                {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
+                {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
+                {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
+                {"action": "click_coords", "x": 473, "y": 943, "timeout": 1},
                 {
                     "action": "loop_cases",
                     "cases": [
